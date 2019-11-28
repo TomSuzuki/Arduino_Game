@@ -19,5 +19,5 @@ void loop() {
   Serial.print(ac.getAngleY());
   Serial.println();
 
-  delay(1000 / 30);
+  delay(1000 / 5);
 }

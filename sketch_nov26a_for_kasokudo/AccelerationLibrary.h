@@ -17,6 +17,11 @@
  * Serial.print(ac.getAngleX());
  * Serial.print(ac.getAngleY());
  * 
+ * // ピンのつなぎ方
+ * VCC：5V
+ * GND：GNS
+ * SDA, SCL
+ * 
  */
 
 #include <Wire.h>
