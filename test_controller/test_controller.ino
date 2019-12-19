@@ -45,9 +45,7 @@ void loop()
   String cmds[] = {};
   String cmd = class_PX.getCmd();
   if (cmd.compareTo("") != 0) {
-    split(cmd, ',', cmds);
-    String ss = "cmd_" + cmd;// cmdに文字列が入ってない？変数じゃなかったら送信できる。
-    class_PX.sendData(ss);
+    class_PX.sendData(getValue(cmd, ',', 0));
   }
 
   // コントローラーの更新速度（1秒間に5回の精度で更新を行う）
