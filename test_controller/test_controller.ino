@@ -53,20 +53,22 @@ void loop()
   class_AC.update();
   class_VX[0].update();
   class_VX[1].update();
+  bool ButtonL = class_BX[0].update();
+  bool ButtonR = class_BX[1].update();
 
   // 各種センサの値をとりにいく
   int AngleX = class_AC.getAngleX();
   int AngleY = class_AC.getAngleY();
-  int ButtonL = class_BX[0].get();
-  int ButtonR = class_BX[1].get();
 
-  // データを送る（加速度の値、ボタンの状態）
-  if (frameCount % 12 == 0) {
+  // データを送る（加速度の値）
+  if (frameCount % 20 == 0) {
     class_PX.sendData(FUNCTION_AC_X, String(AngleX));
     class_PX.sendData(FUNCTION_AC_Y, String(AngleY));
-    class_PX.sendData(FUNCTION_SW_LEFT, String(ButtonL));
-    class_PX.sendData(FUNCTION_SW_RIGHT, String(ButtonR));
   }
+
+  // データを送る（ボタンの状態）
+  if (ButtonL) class_PX.sendData(FUNCTION_SW_LEFT, String(class_BX[0].get()));
+  if (ButtonR) class_PX.sendData(FUNCTION_SW_RIGHT, String(class_BX[1].get()));
 
   // データの受信
   class_PX.getData();
