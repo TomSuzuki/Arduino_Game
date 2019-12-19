@@ -2,15 +2,22 @@ import processing.serial.*;
 import cc.arduino.*;
 Arduino arduino;
 
-// 変数
+// 変数（コントローラー接続用）
 Serial[] serial_arduino = {null, null};
 String[] StringData = {"", ""};
 
 // 送信関数定義
-final int FUNCTION_TEST = 0;
-final int FUNCTION_LED = 1;
+final int FUNCTION_TEST = 999;        // 何も行わない
+final int FUNCTION_LED = 10;          // LED制御を行う（processing→arduino）
+final int FUNCTION_VM_LEFT = 2;       // 左の振動モーター（processing→arduino）
+final int FUNCTION_VM_RIGHT = 3;      // 右の振動モーター（processing→arduino）
+final int FUNCTION_LCD = 32;          // LCDディスプレイに文字を送る（processing→arduino）
+final int FUNCTION_AC_X = 7;          // xの傾き（arduino→processing）
+final int FUNCTION_AC_Y = 8;          // yの傾き（arduino→processing）
+final int FUNCTION_SW_LEFT = 5;       // 左のスイッチ（arduino→processing）
+final int FUNCTION_SW_RIGHT = 6;      // 右のスイッチ（arduino→processing）
 
-  void setup() {
+void setup() {
   // 接続を行う
   fn_setup();
 }

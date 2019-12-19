@@ -14,7 +14,7 @@ const int FUNCTION_AC_Y = 8;          // yの傾き（arduino→processing）
 const int FUNCTION_SW_LEFT = 5;       // 左のスイッチ（arduino→processing）
 const int FUNCTION_SW_RIGHT = 6;      // 右のスイッチ（arduino→processing）
 
-// pinの設定
+// pinの設定（加速度、LCDは固定ピン）
 const int pin_Swicth[] = {2, 3};
 const int pin_Motor[] = {A0, A1};
 const int pin_LED[] = {8, 9};
@@ -57,7 +57,7 @@ void loop()
   String cmd = class_PX.getCmd();
   if (cmd.compareTo("") != 0) {
     switch (getValue(cmd, ',', 0).toInt()) {
-      case FUNCTION_TEST:
+      case FUNCTION_TEST: // 何もしない（デバッグ用関数）
         break;
       case FUNCTION_LED:  // LEDの制御を行う（0なら0番を光らせる）
         bool b = getValue(cmd, ',', 1).toInt() == 0;
