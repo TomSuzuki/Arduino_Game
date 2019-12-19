@@ -4,6 +4,7 @@ Arduino arduino;
 
 // 変数
 Serial[] serial_arduino = {null, null};
+String[] StringData = {"", ""};
 
 void setup() {
   // 接続を行う
@@ -12,8 +13,8 @@ void setup() {
 
 // test
 void mousePressed() { 
-  sendIntData(0, 1033);
-  sendIntData(1, 1999);
+  sendData(0, "1033 testData");
+  sendData(1, "1999 OK?");
 }
 
 void draw() {
@@ -40,20 +41,23 @@ String[] getArduinos() {
 }
 
 // shortデータの送信
-void sendIntData(int n, int value) {
-  byte high = (byte)((value & 0xFF00) >> 8);
-  byte low =  (byte)( value & 0x00FF);
-  serial_arduino[n].write('H');  // ヘッダの送信
-  serial_arduino[n].write(high); // 上位バイトの送信
-  serial_arduino[n].write(low);  // 下位バイトの送信
+void sendData(int n, String s) {
+  serial_arduino[n].write(s + "\0");
 }
 
 // データの受信
 void serialEvent(Serial port) {
   if (port.available() > 0 ) {
-    String data = trim(port.readStringUntil('\n'));
+    String data = port.readString();
     if ( data != null ) {
-      println("data =", data, ": port =",port.port == serial_arduino[0].port ? "0" : "1");
+      int pt = port.port == serial_arduino[0].port ? 0 : 1;
+      if (!data.equals(";")) {
+        StringData[pt] += data;
+      } else {
+        // 受信データから実行
+        println("port =", pt, "[", StringData[pt], "]");
+        StringData[pt] = "";
+      }
     }
   }
 }
