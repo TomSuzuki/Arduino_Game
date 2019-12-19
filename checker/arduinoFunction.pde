@@ -26,20 +26,26 @@ int controller_ButtonR(int n) {
   return class_Arduino.getButtonR(n);
 }
 
-void controller_MotorL(int n, int m) {
-  sendCmd(n, ""+FUNCTION_VM_LEFT+","+m);
+void controller_MotorL(int n, int m, int l) {
+  sendCmd(n, ""+FUNCTION_VM_LEFT+","+m+","+l);
 }
 
-void controller_MotorR(int n, int m) {
-  sendCmd(n, ""+FUNCTION_VM_RIGHT+","+m);
+void controller_MotorR(int n, int m, int l) {
+  sendCmd(n, ""+FUNCTION_VM_RIGHT+","+m+","+l);
 }
 
 void controller_LED(int n, int m) {
   sendCmd(n, ""+FUNCTION_LED+","+m);
+
+  // test
+  test_LED[n] = m;
 }
 
 void controller_LCD(int n, String s) {
   sendCmd(n, ""+FUNCTION_LCD+","+s);
+
+  // test
+  test_LCD[n] = s;
 }
 
 void sendCmd(int n, String s) {
