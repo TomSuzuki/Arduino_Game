@@ -86,6 +86,12 @@ void loop()
         class_LX[0].set(b);
         class_LX[0].set(!b);
         break;
+      case FUNCTION_VM_LEFT:  // Lモーター
+        class_VX[0].set(getValue(cmd, ',', 1).toInt(), getValue(cmd, ',', 2).toInt());
+        break;
+      case FUNCTION_VM_RIGHT:  // Rモーター
+        class_VX[1].set(getValue(cmd, ',', 1).toInt(), getValue(cmd, ',', 2).toInt());
+        break;
       case FUNCTION_LCD:  // LCDディスプレイに文字列を表示
         class_CX.set(getValue(cmd, ',', 1));
         break;
