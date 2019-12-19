@@ -6,14 +6,18 @@ Arduino arduino;
 Serial[] serial_arduino = {null, null};
 String[] StringData = {"", ""};
 
-void setup() {
+// 送信関数定義
+final int FUNCTION_TEST = 0;
+final int FUNCTION_LED = 1;
+
+  void setup() {
   // 接続を行う
   fn_setup();
 }
 
 // test
 void mousePressed() { 
-  sendData(0, "function,testData");
+  sendData(0, ""+FUNCTION_LED+",testData");
   //sendData(1, "1999 OK?");
 }
 
