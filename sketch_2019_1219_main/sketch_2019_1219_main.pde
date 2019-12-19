@@ -24,7 +24,7 @@ void setup() {
 
 // test
 void mousePressed() { 
-  sendData(0, ""+FUNCTION_LED+",testData");
+  sendData(0, ""+FUNCTION_TEST+",testData");
   //sendData(1, "1999 OK?");
 }
 

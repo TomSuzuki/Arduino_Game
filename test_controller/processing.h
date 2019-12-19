@@ -12,6 +12,7 @@ class PSENDX {
     void setup(int pin);
     void getData();
     void sendData(String s);
+    void sendData(int n, String s);
     String getCmd();
 
 };
@@ -36,6 +37,15 @@ void PSENDX::getData() {
 
 // データの送信を行う
 void PSENDX::sendData(String s) {
+  for (int i = 0; i < s.length(); i++) Serial.write(s.charAt(i));
+  Serial.write(';');
+}
+
+// 関数値を値で受け取る
+void PSENDX::sendData(int n, String s) {
+  String temp = String(n);
+  for (int i = 0; i < temp.length(); i++) Serial.write(temp.charAt(i));
+  Serial.write(',');
   for (int i = 0; i < s.length(); i++) Serial.write(s.charAt(i));
   Serial.write(';');
 }

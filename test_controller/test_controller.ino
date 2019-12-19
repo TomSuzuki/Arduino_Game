@@ -2,6 +2,8 @@
 #include "processing.h"
 #include "LEDX.h"
 #include "LCDX.h"
+#include "VibrationMotor.h"
+#include "Button.h"
 
 // 関数列挙（できるかぎり同じ形でprocessingでも使えるものが望ましい）
 const int FUNCTION_TEST = 999;        // 何も行わない
@@ -15,15 +17,20 @@ const int FUNCTION_SW_LEFT = 5;       // 左のスイッチ（arduino→processi
 const int FUNCTION_SW_RIGHT = 6;      // 右のスイッチ（arduino→processing）
 
 // pinの設定（加速度、LCDは固定ピン）
-const int pin_Swicth[] = {2, 3};
-const int pin_Motor[] = {A0, A1};
-const int pin_LED[] = {8, 9};
+const int pin_Button[] = {2, 3};   // L R
+const int pin_Motor[] = {A0, A1};  // L R
+const int pin_LED[] = {8, 9};      // L R
 
 // 制御用クラスの定義
 AccelerationClass class_AC = AccelerationClass();
 LEDX class_LX[2];
 LCDX class_CX = LCDX();
 PSENDX class_PX = PSENDX();
+VMX class_VX[2];
+ButtonX class_BX[2];
+
+// グローバル制御
+int frameCount = 0;
 
 void setup()
 {
@@ -35,19 +42,31 @@ void setup()
   class_AC.setup();
   class_LX[0].setup(pin_LED[0]);
   class_LX[1].setup(pin_LED[1]);
-
+  class_VX[0].setup(pin_Motor[0]);
+  class_VX[1].setup(pin_Motor[1]);
+  class_BX[0].setup(pin_Button[0]);
 }
 
 void loop()
 {
-  // 各種センサの値を更新
+  // 各種センサ、パーツの値などを更新
   class_AC.update();
+  class_VX[0].update();
+  class_VX[1].update();
 
   // 各種センサの値をとりにいく
-  int x = class_AC.getAngleX();
-  int y = class_AC.getAngleY();
+  int AngleX = class_AC.getAngleX();
+  int AngleY = class_AC.getAngleY();
+  int ButtonL = class_BX[0].get();
+  int ButtonR = class_BX[1].get();
 
-  // データを送る
+  // データを送る（加速度の値、ボタンの状態）
+  if (frameCount % 12 == 0) {
+    class_PX.sendData(FUNCTION_AC_X, String(AngleX));
+    class_PX.sendData(FUNCTION_AC_Y, String(AngleY));
+    class_PX.sendData(FUNCTION_SW_LEFT, String(ButtonL));
+    class_PX.sendData(FUNCTION_SW_RIGHT, String(ButtonR));
+  }
 
   // データの受信
   class_PX.getData();
@@ -58,6 +77,7 @@ void loop()
   if (cmd.compareTo("") != 0) {
     switch (getValue(cmd, ',', 0).toInt()) {
       case FUNCTION_TEST: // 何もしない（デバッグ用関数）
+        class_PX.sendData(FUNCTION_TEST, "This is test function.");
         break;
       case FUNCTION_LED:  // LEDの制御を行う（0なら0番を光らせる）
         bool b = getValue(cmd, ',', 1).toInt() == 0;
@@ -69,4 +89,5 @@ void loop()
 
   // コントローラーの更新速度（1秒間に5回の精度で更新を行う）
   delay(1000 / 60);
+  frameCount++;
 }
