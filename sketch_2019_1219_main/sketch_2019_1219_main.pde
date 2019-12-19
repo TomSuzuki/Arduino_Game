@@ -13,8 +13,8 @@ void setup() {
 
 // test
 void mousePressed() { 
-  sendData(0, "1033 testData");
-  sendData(1, "1999 OK?");
+  sendData(0, "function,testData");
+  //sendData(1, "1999 OK?");
 }
 
 void draw() {
@@ -25,11 +25,11 @@ void fn_setup() {
   String[] Arduinos = getArduinos();
   if (Arduinos.length != 2) {
     println("Arduinoの取得に失敗しました。");
-    exit();
+    //exit();
   }
   println(Arduinos);
   serial_arduino[0] = new Serial(this, Arduinos[0], 9600);
-  serial_arduino[1] = new Serial(this, Arduinos[1], 9600);
+  //serial_arduino[1] = new Serial(this, Arduinos[1], 9600);
 }
 
 // Arduinoの一覧を取得する（Mac用）
@@ -42,12 +42,12 @@ String[] getArduinos() {
 
 // shortデータの送信
 void sendData(int n, String s) {
-  serial_arduino[n].write(s + "\0");
+  serial_arduino[n].write(s + ";");
 }
 
 // データの受信
 void serialEvent(Serial port) {
-  if (port.available() > 0 ) {
+  while (port.available() > 0 ) {
     String data = port.readString();
     if ( data != null ) {
       int pt = port.port == serial_arduino[0].port ? 0 : 1;
