@@ -86,6 +86,9 @@ void loop()
         class_LX[0].set(b);
         class_LX[0].set(!b);
         break;
+      case FUNCTION_LCD:  // LCDディスプレイに文字列を表示
+        class_CX.set(getValue(cmd, ',', 1));
+        break;
     }
   }
 
