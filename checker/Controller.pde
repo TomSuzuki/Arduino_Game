@@ -20,6 +20,9 @@
  * controller.setLCD(i, s);  // sはディスプレイに表示する文字列（最大32文字）
  * controller.setLED(i, n);  // nはコントローラーID（基本的にiと同じ）
  * 
+ * // デバッグ用
+ * controller.getArduinoName(i);  // 名前の取得
+ * 
  */
 
 
@@ -28,7 +31,7 @@ import processing.serial.*;
 import cc.arduino.*;
 Arduino arduino;
 
-// 制御用クラス生成（する意味があるとは思えない...）
+// 制御用クラス生成
 Controller controller = new Controller();  // 名前固定
 
 // 送受信用定義
@@ -103,6 +106,11 @@ class Controller {
         arduinoState.get(player).Command = "";
       }
     }
+  }
+
+  // デバッグ用
+  String getArduinoName(int player) {
+    return arduinoState.get(player).ArduinoName;
   }
 
   // 取得用

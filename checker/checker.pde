@@ -14,7 +14,7 @@ void draw() {
   stroke(255);
   for (int i = 0; i < 2; i++) {
     pos(5 + 320*i, 20, 18);
-    //msg("ArduinoID = " + ArduinoString[i]);
+    msg("ArduinoName = " + controller.getArduinoName(i));
     msg("");
     msg("Angle_X = "+controller.getAngleX(i));
     msg("Angle_Y = "+controller.getAngleY(i));
