@@ -1,0 +1,50 @@
+build 191221a
+
+
+
+controller_Setup(String[] s)
+- setup時に必ず行う
+- sはArduinoのリストを入れる
+- sは必ず長さ2の文字列配列にする
+- ゲームを作る際は気にしなくてOK
+
+
+
+controller_AngleX(int n)
+- nはプレイヤー番号
+- コントローラーのxの角度を取得する
+- 右に傾けると値が増える
+
+
+
+controller_AngleY(int n)
+- nはプレイヤー番号
+- コントローラーのyの角度を取得する
+- 下に傾けると値が増える
+
+
+
+controller_ButtonL(int n), controller_ButtonR(int n)
+- nはプレイヤー番号
+- ボタンの状態を取得
+- 押している間返却値が1になる
+
+
+
+controller_MotorL(int n,int m,int l), controller_MotorR(int n,int m,int l)
+- nはプレイヤー番号
+- mは強さ（0-3）
+- lは時間（ms）
+
+
+
+controller_LED(int n,int m)
+- nはプレイヤー番号
+- mはプレイヤーID（基本的にnとmは同じ）
+
+
+
+controller_LCD(int n, String s)
+- nはプレイヤー番号
+- sは入れる文字列（英数と一部の記号、32文字まで）
+

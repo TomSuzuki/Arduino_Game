@@ -1,5 +1,4 @@
 // コントローラのテスト用
-String ArduinoString[] = {"COM5", "COM6"};
 
 // 仮
 String test_LCD[] = {"", ""};
@@ -7,7 +6,8 @@ int test_LED[] = {0, 1};
 
 void setup() {
   size(640, 480);
-  class_Arduino.arduinoSetup();
+  String ArduinoString[] = {"COM5", "COM6"};
+  controller_Setup(ArduinoString);
   delay(1000);
   controller_LED(0, 0);
   controller_LED(1, 1);
@@ -19,7 +19,7 @@ void draw() {
   stroke(255);
   for (int i = 0; i < 2; i++) {
     pos(5 + 320*i, 20, 18);
-    msg("ArduinoID = " + ArduinoString[i]);
+    //msg("ArduinoID = " + ArduinoString[i]);
     msg("");
     msg("Angle_X = "+controller_AngleX(i));
     msg("Angle_Y = "+controller_AngleY(i));
@@ -39,10 +39,22 @@ void draw() {
     if (button(x, y+=20, "Motor_R 2 500ms")) controller_MotorR(i, 2, 500);  
     if (button(x, y+=20, "Motor_L 1 500ms")) controller_MotorL(i, 1, 500);
     if (button(x, y+=20, "Motor_R 1 500ms")) controller_MotorR(i, 1, 500);  
-    if (button(x, y+=20, "controller_LCD test")) controller_LCD(i, "test");
-    if (button(x, y+=20, "controller_LCD display!!")) controller_LCD(i, "display!!");    
-    if (button(x, y+=20, "controller_LED 0")) controller_LED(i, 0);
-    if (button(x, y+=20, "controller_LED 1")) controller_LED(i, 1);
+    if (button(x, y+=20, "controller_LCD test")) {
+      controller_LCD(i, "test");
+      test_LCD[i] = "test";
+    }
+    if (button(x, y+=20, "controller_LCD display!!")) {
+      controller_LCD(i, "display!!");    
+      test_LCD[i] = "display!!";
+    }
+    if (button(x, y+=20, "controller_LED 0")) {
+      controller_LED(i, 0); 
+      test_LED[i] = 0;
+    }
+    if (button(x, y+=20, "controller_LED 1")) { 
+      controller_LED(i, 1); 
+      test_LED[i] = 1;
+    }
   }
 }
 

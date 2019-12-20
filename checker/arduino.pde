@@ -4,6 +4,16 @@ Arduino arduino;
 
 ArduinoX class_Arduino = new ArduinoX();  // 名前固定
 
+final int FUNCTION_TEST = 999;        // 何も行わない
+final int FUNCTION_LED = 10;          // LED制御を行う（processing→arduino）
+final int FUNCTION_VM_LEFT = 2;       // 左の振動モーター（processing→arduino）
+final int FUNCTION_VM_RIGHT = 3;      // 右の振動モーター（processing→arduino）
+final int FUNCTION_LCD = 32;          // LCDディスプレイに文字を送る（processing→arduino）
+final int FUNCTION_AC_X = 7;          // xの傾き（arduino→processing）
+final int FUNCTION_AC_Y = 8;          // yの傾き（arduino→processing）
+final int FUNCTION_SW_LEFT = 5;       // 左のスイッチ（arduino→processing）
+final int FUNCTION_SW_RIGHT = 6;      // 右のスイッチ（arduino→processing）
+
 class ArduinoX {
 
   // 使用する変数とか
@@ -16,21 +26,10 @@ class ArduinoX {
   private int ButtonL[] = {0, 0};
   private int ButtonR[] = {0, 0};
 
-  // 定義
-  private final int FUNCTION_TEST = 999;        // 何も行わない
-  private final int FUNCTION_LED = 10;          // LED制御を行う（processing→arduino）
-  private final int FUNCTION_VM_LEFT = 2;       // 左の振動モーター（processing→arduino）
-  private final int FUNCTION_VM_RIGHT = 3;      // 右の振動モーター（processing→arduino）
-  private final int FUNCTION_LCD = 32;          // LCDディスプレイに文字を送る（processing→arduino）
-  private final int FUNCTION_AC_X = 7;          // xの傾き（arduino→processing）
-  private final int FUNCTION_AC_Y = 8;          // yの傾き（arduino→processing）
-  private final int FUNCTION_SW_LEFT = 5;       // 左のスイッチ（arduino→processing）
-  private final int FUNCTION_SW_RIGHT = 6;      // 右のスイッチ（arduino→processing）
-
   // 初期化を行う
-  void arduinoSetup() {
-    serial_arduino[0] = makeSerial(ArduinoString[0]);
-    serial_arduino[1] = makeSerial(ArduinoString[1]);
+  void arduinoSetup(String[] list) {
+    serial_arduino[0] = makeSerial(list[0]);
+    serial_arduino[1] = makeSerial(list[1]);
     println("接続完了！");
   }
 
@@ -100,4 +99,55 @@ void serialEvent(Serial port) {
 // なんかグローバルじゃなきゃうまく行かなかった
 Serial makeSerial(String s) {
   return new Serial(this, s, 9600);
+}
+
+// ---------------------------------------------------------------------------------------------- //
+// setup時に必ず行う（リストを入れる）
+void controller_Setup(String[] list) {
+  class_Arduino.arduinoSetup(list);
+}
+
+// 角度の取得 x
+int controller_AngleX(int n) {
+  return class_Arduino.getAngleX(n);
+}
+
+// 角度の取得 y
+int controller_AngleY(int n) {
+  return class_Arduino.getAngleY(n);
+}
+
+// ボタンの取得 L
+int controller_ButtonL(int n) {
+  return class_Arduino.getButtonL(n);
+}
+
+// ボタンの取得 R
+int controller_ButtonR(int n) {
+  return class_Arduino.getButtonR(n);
+}
+
+// モーターの動作 L （強さ0-3,時間ms）
+void controller_MotorL(int n, int m, int l) {
+  sendCmd(n, ""+FUNCTION_VM_LEFT+","+m+","+l);
+}
+
+// モーターの動作 R （強さ0-3,時間ms）
+void controller_MotorR(int n, int m, int l) {
+  sendCmd(n, ""+FUNCTION_VM_RIGHT+","+m+","+l);
+}
+
+// LEDの点灯 （0 or 1）
+void controller_LED(int n, int m) {
+  sendCmd(n, ""+FUNCTION_LED+","+m);
+}
+
+// LCDに文字列を送る
+void controller_LCD(int n, String s) {
+  sendCmd(n, ""+FUNCTION_LCD+","+s);
+}
+
+// 内部関数
+void sendCmd(int n, String s) {
+  class_Arduino.setCmd(n, s);
 }
