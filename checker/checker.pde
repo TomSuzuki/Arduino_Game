@@ -1,13 +1,8 @@
 // コントローラのテスト用
 
-// 仮
-String test_LCD[] = {"", ""};
-int test_LED[] = {0, 1};
-
 void setup() {
   size(640, 480);
-  String ArduinoString[] = {"COM5", "COM6"};
-  controller.arduinoSetup(ArduinoString);
+  controller.arduinoSetup(new String[] {"COM5", "COM6"});
   delay(1000);
   controller.setLED(0, 0);
   controller.setLED(1, 1);
@@ -57,6 +52,10 @@ void draw() {
     }
   }
 }
+
+// 仮
+String test_LCD[] = {"", ""};
+int test_LED[] = {0, 1};
 
 // 表示用（仮）
 int msgX, msgY, msgAdd;

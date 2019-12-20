@@ -1,5 +1,5 @@
 /*
- * コントローラー用クラス ver 1.10
+ * コントローラー用クラス ver 1.10c
  * - クラス名のcontrollerは固定（serial関連がうまく行き次第直す）
  *
  * // setup内で必ず実行
@@ -142,6 +142,17 @@ class Controller {
 
   void setLCD(int n, String s) {
     sendCmd(n, ""+FUNCTION_LCD+","+s);
+  }
+
+  // Arduinoのリストを取得する（未完成；Mac用↓）
+  String[] getArduinoList() {
+    String[] ss = {};
+    String[] list = Arduino.list();
+    for (String s : list) {
+      if (s.split("cu.usbmodem").length == 2) ss = append(ss, s);
+      println(s.toString());
+    }
+    return ss;
   }
 }
 
