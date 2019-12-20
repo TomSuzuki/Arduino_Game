@@ -7,10 +7,10 @@ int test_LED[] = {0, 1};
 void setup() {
   size(640, 480);
   String ArduinoString[] = {"COM5", "COM6"};
-  controller_Setup(ArduinoString);
+  controller.arduinoSetup(ArduinoString);
   delay(1000);
-  controller_LED(0, 0);
-  controller_LED(1, 1);
+  controller.setLED(0, 0);
+  controller.setLED(1, 1);
 }
 
 void draw() {
@@ -21,10 +21,10 @@ void draw() {
     pos(5 + 320*i, 20, 18);
     //msg("ArduinoID = " + ArduinoString[i]);
     msg("");
-    msg("Angle_X = "+controller_AngleX(i));
-    msg("Angle_Y = "+controller_AngleY(i));
-    msg("Button_L = "+controller_ButtonL(i));
-    msg("Button_R = "+controller_ButtonR(i));
+    msg("Angle_X = "+controller.getAngleX(i));
+    msg("Angle_Y = "+controller.getAngleY(i));
+    msg("Button_L = "+controller.getButtonL(i));
+    msg("Button_R = "+controller.getButtonR(i));
     msg("");
     msg("Motor_L = #nodata");
     msg("Motor_R = #nodata");
@@ -33,26 +33,26 @@ void draw() {
 
     int x = 5 + 320*i;
     int y = 220;
-    if (button(x, y+=20, "Motor_L 3 1000ms")) controller_MotorL(i, 3, 1000);
-    if (button(x, y+=20, "Motor_R 3 1000ms")) controller_MotorR(i, 3, 1000);    
-    if (button(x, y+=20, "Motor_L 2 500ms")) controller_MotorL(i, 2, 500);
-    if (button(x, y+=20, "Motor_R 2 500ms")) controller_MotorR(i, 2, 500);  
-    if (button(x, y+=20, "Motor_L 1 500ms")) controller_MotorL(i, 1, 500);
-    if (button(x, y+=20, "Motor_R 1 500ms")) controller_MotorR(i, 1, 500);  
+    if (button(x, y+=20, "Motor_L 3 1000ms")) controller.setMotorL(i, 3, 1000);
+    if (button(x, y+=20, "Motor_R 3 1000ms")) controller.setMotorR(i, 3, 1000);    
+    if (button(x, y+=20, "Motor_L 2 500ms")) controller.setMotorL(i, 2, 500);
+    if (button(x, y+=20, "Motor_R 2 500ms")) controller.setMotorR(i, 2, 500);  
+    if (button(x, y+=20, "Motor_L 1 500ms")) controller.setMotorL(i, 1, 500);
+    if (button(x, y+=20, "Motor_R 1 500ms")) controller.setMotorR(i, 1, 500);  
     if (button(x, y+=20, "controller_LCD test")) {
-      controller_LCD(i, "test");
+      controller.setLCD(i, "test");
       test_LCD[i] = "test";
     }
     if (button(x, y+=20, "controller_LCD display!!")) {
-      controller_LCD(i, "display!!");    
+      controller.setLCD(i, "display!!");    
       test_LCD[i] = "display!!";
     }
     if (button(x, y+=20, "controller_LED 0")) {
-      controller_LED(i, 0); 
+      controller.setLED(i, 0); 
       test_LED[i] = 0;
     }
     if (button(x, y+=20, "controller_LED 1")) { 
-      controller_LED(i, 1); 
+      controller.setLED(i, 1); 
       test_LED[i] = 1;
     }
   }
