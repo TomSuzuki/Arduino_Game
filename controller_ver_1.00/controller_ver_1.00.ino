@@ -61,7 +61,7 @@ void loop()
   int AngleY = class_AC.getAngleY();
 
   // データを送る（加速度の値）
-  if (frameCount % 20 == 0) {
+  if (frameCount % 3 == 0) {
     class_PX.sendData(FUNCTION_AC_X, String(AngleX));
     class_PX.sendData(FUNCTION_AC_Y, String(AngleY));
   }
@@ -100,4 +100,5 @@ void loop()
   // コントローラーの更新速度（1秒間に5回の精度で更新を行う）
   delay(1000 / 60);
   frameCount++; // 内部カウンタ
+  digitalWrite(13, frameCount % 30 == 0 ? HIGH : LOW);
 }
