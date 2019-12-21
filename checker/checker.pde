@@ -28,12 +28,12 @@ void draw() {
 
     int x = 5 + 320*i;
     int y = 220;
-    if (button(x, y+=20, "Motor_L 3 1000ms")) controller.setMotorL(i, 3, 1000);
-    if (button(x, y+=20, "Motor_R 3 1000ms")) controller.setMotorR(i, 3, 1000);    
-    if (button(x, y+=20, "Motor_L 2 500ms")) controller.setMotorL(i, 2, 500);
-    if (button(x, y+=20, "Motor_R 2 500ms")) controller.setMotorR(i, 2, 500);  
-    if (button(x, y+=20, "Motor_L 1 500ms")) controller.setMotorL(i, 1, 500);
-    if (button(x, y+=20, "Motor_R 1 500ms")) controller.setMotorR(i, 1, 500);  
+    if (button(x, y+=20, "Motor_L 3 1000ms")) controller.setMotorL(i, MOTOR_HIGH, 1000);
+    if (button(x, y+=20, "Motor_R 3 1000ms")) controller.setMotorR(i, MOTOR_HIGH, 1000);    
+    if (button(x, y+=20, "Motor_L 2 500ms")) controller.setMotorL(i, MOTOR_MIDDLE, 500);
+    if (button(x, y+=20, "Motor_R 2 500ms")) controller.setMotorR(i, MOTOR_MIDDLE, 500);  
+    if (button(x, y+=20, "Motor_L 1 500ms")) controller.setMotorL(i, MOTOR_LOW, 500);
+    if (button(x, y+=20, "Motor_R 1 500ms")) controller.setMotorR(i, MOTOR_LOW, 500);  
     if (button(x, y+=20, "controller_LCD test")) {
       controller.setLCD(i, "test");
       test_LCD[i] = "test";
