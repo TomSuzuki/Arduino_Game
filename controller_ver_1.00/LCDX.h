@@ -1,14 +1,14 @@
-/* 
- *  2019-12-19 TomSuzuki
- *  version 1.00
- *  
- *  使い方のメモ
- *    ピンの場所は固定
- *  
- *  // 文字を出力
- *  LX.set("test");
- * 
- */
+/*
+    2019-12-19 TomSuzuki
+    version 1.00
+
+    使い方のメモ
+      ピンの場所は固定
+
+    // 文字を出力
+    LX.set("test");
+
+*/
 
 #include <LiquidCrystal.h>
 #include "Arduino.h"
@@ -25,6 +25,8 @@ class LCDX {
 };
 
 LCDX::LCDX() {
+  lcd.begin(16, 2);
+  lcd.clear();
 }
 
 void LCDX::set(String s) {
@@ -32,4 +34,6 @@ void LCDX::set(String s) {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print(s);
+  lcd.setCursor(0, 1);
+  lcd.print(s.substring(16));
 }

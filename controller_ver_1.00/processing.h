@@ -26,7 +26,6 @@ void PSENDX::setup(int _pin) {
 void PSENDX::getData() {
   // データ受信したとき（最大64文字）
   while (Serial.available()) {
-    digitalWrite(13, HIGH); // 【重要】LCDディスプレイ接続時はdigitalWrite 13 を消す！
     data[ct] = Serial.read();
     if (ct > 64 || data[ct] == ';') {
       data[ct] = '\0';

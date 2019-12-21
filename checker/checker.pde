@@ -38,9 +38,9 @@ void draw() {
       controller.setLCD(i, "test");
       test_LCD[i] = "test";
     }
-    if (button(x, y+=20, "controller_LCD display!!")) {
-      controller.setLCD(i, "display!!");    
-      test_LCD[i] = "display!!";
+    if (button(x, y+=20, "controller_LCD ﾃﾞｨｽﾌﾟﾚｲ...")) {
+      controller.setLCD(i, "ﾃﾞｨｽﾌﾟﾚｲ", "2 ｷﾞｮｳﾒ");    
+      test_LCD[i] = "ﾃﾞｨｽﾌﾟﾚｲ...";
     }
     if (button(x, y+=20, "controller_LED 0")) {
       controller.setLED(i, 0); 

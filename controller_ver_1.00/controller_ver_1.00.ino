@@ -100,5 +100,4 @@ void loop()
   // コントローラーの更新速度（1秒間に5回の精度で更新を行う）
   delay(1000 / 60);
   frameCount++; // 内部カウンタ
-  digitalWrite(13, LOW);
 }

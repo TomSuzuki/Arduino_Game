@@ -1,5 +1,5 @@
 /*
- * コントローラー用クラス ver 1.10c
+ * コントローラー用クラス ver 1.11
  * - クラス名のcontrollerは固定（serial関連がうまく行き次第直す）
  *
  * // setup内で必ず実行
@@ -18,6 +18,7 @@
  * controller.setMotorL(i, power, ms);  // powerは0-3の4段階
  * controller.setMotorR(i, power, ms);
  * controller.setLCD(i, s);  // sはディスプレイに表示する文字列（最大32文字）
+ * controller.setLCD(i, s1, s2);  // 1行ごとに別引数で送る
  * controller.setLED(i, n);  // nはコントローラーID（基本的にiと同じ）
  * 
  * // デバッグ用
@@ -138,7 +139,7 @@ class Controller {
 
   // 送信用（内部用）
   private void sendCmd(int player, String s) {
-    arduinoState.get(player).serial.write(s + ";");
+    arduinoState.get(player).serial.write(s.substring(0, min(64, s.length())) + ";");
   }
 
   // 送信用
@@ -156,6 +157,11 @@ class Controller {
 
   void setLCD(int n, String s) {
     sendCmd(n, ""+FUNCTION_LCD+","+s);
+  }
+
+  void setLCD(int n, String s, String s2) {
+    s = s + "                  ";
+    sendCmd(n, ""+FUNCTION_LCD+","+s.substring(0, 16)+s2);
   }
 
   // Arduinoのリストを取得する（未完成；Mac用↓）
