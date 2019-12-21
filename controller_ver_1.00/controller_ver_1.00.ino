@@ -17,9 +17,9 @@ const int FUNCTION_SW_LEFT = 5;       // 左のスイッチ（arduino→processi
 const int FUNCTION_SW_RIGHT = 6;      // 右のスイッチ（arduino→processing）
 
 // pinの設定（加速度、LCDは固定ピン）
-const int pin_Button[] = {2, 3};   // L R
+const int pin_Button[] = {9, 8};   // L R
 const int pin_Motor[] = {A0, A1};  // L R
-const int pin_LED[] = {8, 9};      // L R
+const int pin_LED[] = {2, 3};      // L R
 
 // 制御用クラスの定義
 AccelerationClass class_AC = AccelerationClass();
@@ -45,6 +45,7 @@ void setup()
   class_VX[0].setup(pin_Motor[0]);
   class_VX[1].setup(pin_Motor[1]);
   class_BX[0].setup(pin_Button[0]);
+  class_BX[1].setup(pin_Button[1]);
 }
 
 void loop()
@@ -81,9 +82,8 @@ void loop()
         class_PX.sendData(FUNCTION_TEST, "This is test function.");
         break;
       case FUNCTION_LED:  // LEDの制御を行う（0なら0番を光らせる）
-        bool b = getValue(cmd, ',', 1).toInt() == 0;
-        class_LX[0].set(b);
-        class_LX[0].set(!b);
+        class_LX[0].set(getValue(cmd, ',', 1).toInt() == 0);
+        class_LX[1].set(getValue(cmd, ',', 1).toInt() != 0);
         break;
       case FUNCTION_VM_LEFT:  // Lモーター
         class_VX[0].set(getValue(cmd, ',', 1).toInt(), getValue(cmd, ',', 2).toInt());

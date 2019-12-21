@@ -45,6 +45,12 @@ final int FUNCTION_AC_Y = 8;          // yの傾き（arduino→processing）
 final int FUNCTION_SW_LEFT = 5;       // 左のスイッチ（arduino→processing）
 final int FUNCTION_SW_RIGHT = 6;      // 右のスイッチ（arduino→processing）
 
+// 推奨引数
+final int MOTOR_OFF = 0;
+final int MOTOR_LOW = 1;
+final int MOTOR_MIDDLE = 2;
+final int MOTOR_HIGH = 3;
+
 // まとめようとして中途半端になったやつ
 class Controller {
 
