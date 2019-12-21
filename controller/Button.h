@@ -13,10 +13,16 @@ class ButtonX {
     void setup(int pin);
     int get();
     bool update();
+    void reset();
 
 };
 
 ButtonX::ButtonX() {
+}
+
+void ButtonX::reset() {
+  value = 0;
+  ctCount = 0;
 }
 
 void ButtonX::setup(int _pin) {

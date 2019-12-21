@@ -1,28 +1,28 @@
-/* 
- *  2019-11-26 TomSuzuki
- *  version 1.00
- *  
- *  使い方のメモ
- * 
- * // クラスを作る
- * AccelerationClass ac = AccelerationClass();
- * 
- * // setup内で呼ぶ
- * ac.setup();
- * 
- * // 加速度センサの情報を更新する
- * ac.update();
- * 
- * // データを取る
- * Serial.print(ac.getAngleX());
- * Serial.print(ac.getAngleY());
- * 
- * // ピンのつなぎ方
- * VCC：5V
- * GND：GNS
- * SDA, SCL
- * 
- */
+/*
+    2019-11-26 TomSuzuki
+    version 1.00
+
+    使い方のメモ
+
+   // クラスを作る
+   AccelerationClass ac = AccelerationClass();
+
+   // setup内で呼ぶ
+   ac.setup();
+
+   // 加速度センサの情報を更新する
+   ac.update();
+
+   // データを取る
+   Serial.print(ac.getAngleX());
+   Serial.print(ac.getAngleY());
+
+   // ピンのつなぎ方
+   VCC：5V
+   GND：GNS
+   SDA, SCL
+
+*/
 
 #include <Wire.h>
 #include "Arduino.h"
@@ -87,6 +87,7 @@ class AccelerationClass {
     int getAngleX(); // xのゲッター
     int getAngleY(); // yのゲッター
     void update(); // センサーの値を取得する
+    void reset(); // 現在の角度を基本角度にする
 
 };
 
@@ -100,6 +101,12 @@ void AccelerationClass::setup() {
   MPU6050_read(MPU6050_WHO_AM_I, &c, 1);
   MPU6050_read(MPU6050_PWR_MGMT_1, &c, 1);
   MPU6050_write_reg(MPU6050_PWR_MGMT_1, 0);
+  update();
+  cor_angle = { now_angle.x, now_angle.y, now_angle.z};
+}
+
+// 値初期化用
+void AccelerationClass::reset() {
   update();
   cor_angle = { now_angle.x, now_angle.y, now_angle.z};
 }

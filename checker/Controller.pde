@@ -1,5 +1,5 @@
 /*
- * コントローラー用クラス ver 1.11
+ * コントローラー用クラス ver 1.12
  * - クラス名のcontrollerは固定（serial関連がうまく行き次第直す）
  *
  * // setup内で必ず実行
@@ -20,6 +20,7 @@
  * controller.setLCD(i, s);  // sはディスプレイに表示する文字列（最大32文字）
  * controller.setLCD(i, s1, s2);  // 1行ごとに別引数で送る
  * controller.setLED(i, n);  // nはコントローラーID（基本的にiと同じ）
+ * controller.setZero(i);  // コントローラを初期化
  * 
  * // デバッグ用
  * controller.getArduinoName(i);  // 名前の取得
@@ -45,6 +46,7 @@ final int FUNCTION_AC_X = 7;          // xの傾き（arduino→processing）
 final int FUNCTION_AC_Y = 8;          // yの傾き（arduino→processing）
 final int FUNCTION_SW_LEFT = 5;       // 左のスイッチ（arduino→processing）
 final int FUNCTION_SW_RIGHT = 6;      // 右のスイッチ（arduino→processing）
+final int FUNCTION_RESET = 9;         // 値を初期化（processing→arduino）
 
 // 推奨引数
 final int MOTOR_OFF = 0;
@@ -162,6 +164,10 @@ class Controller {
   void setLCD(int n, String s, String s2) {
     s = s + "                  ";
     sendCmd(n, ""+FUNCTION_LCD+","+s.substring(0, 16)+s2);
+  }
+
+  void setZero(int n) {
+    sendCmd(n, ""+FUNCTION_RESET);
   }
 
   // Arduinoのリストを取得する（未完成；Mac用↓）

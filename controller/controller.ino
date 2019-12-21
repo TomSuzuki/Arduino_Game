@@ -1,3 +1,5 @@
+// ver 1.12
+
 #include "AccelerationLibrary.h"
 #include "processing.h"
 #include "LEDX.h"
@@ -15,6 +17,7 @@ const int FUNCTION_AC_X = 7;          // xの傾き（arduino→processing）
 const int FUNCTION_AC_Y = 8;          // yの傾き（arduino→processing）
 const int FUNCTION_SW_LEFT = 5;       // 左のスイッチ（arduino→processing）
 const int FUNCTION_SW_RIGHT = 6;      // 右のスイッチ（arduino→processing）
+const int FUNCTION_RESET = 9;         // 値を初期化（processing→arduino）
 
 // pinの設定（加速度、LCDは固定ピン）
 const int pin_Button[] = {9, 8};   // L R
@@ -93,6 +96,14 @@ void loop()
         break;
       case FUNCTION_LCD:  // LCDディスプレイに文字列を表示
         class_CX.set(getValue(cmd, ',', 1));
+        break;
+      case FUNCTION_RESET:  // 値の初期化（LEDを除く）
+        class_AC.reset();
+        class_CX.set("");
+        class_BX[0].reset();
+        class_BX[1].reset();
+        class_VX[0].set(0, 0);
+        class_VX[1].set(0, 0);
         break;
     }
   }

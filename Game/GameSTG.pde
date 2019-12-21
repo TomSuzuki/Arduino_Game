@@ -96,7 +96,10 @@ class STG extends gameMaster {
     msg("LボタンとRボタンを同時押しでゲームを開始します.", 12, y+=add, LEFT, TOP, #FFFFFF);
 
     // ボタン同時押しでゲーム画面に進む
-    if (controller.getButtonL(0) == 1 && controller.getButtonR(0) == 1) gameFlg = FLG_GAME;
+    if (controller.getButtonL(0) == 1 && controller.getButtonR(0) == 1) {
+      controller.setZero(0);
+      gameFlg = FLG_GAME;
+    }
   };
 
   // ゲーム中の処理
