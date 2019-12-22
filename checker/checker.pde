@@ -50,6 +50,7 @@ void draw() {
       controller.setLED(i, 1); 
       test_LED[i] = 1;
     }
+    if (button(x, y+=20, "setZero")) controller.setZero(i);
   }
 }
 
