@@ -2,7 +2,8 @@
 
 void setup() {
   size(640, 480);
-  controller.arduinoSetup(new String[] {"COM6"});
+  //controller.arduinoSetup(new String[] {"COM6"});
+  controller.arduinoSetup(controller.getArduinoList());
   delay(1000);
   controller.setLED(0, 0);
   //controller.setLED(1, 1);
