@@ -95,7 +95,10 @@ class STG extends gameMaster {
       time++;
 
       // 当たり判定
-      for (int i = 0; i < pBullet.size(); i++) if (pBullet.get(i).hitChk(x, y, 48)) hp-=1;
+      for (int i = 0; i < pBullet.size(); i++) if (pBullet.get(i).hitChk(x, y, 48)) {
+        hp-=1;
+        pBullet.remove(i);
+      }
       if (hp <= 0) score += 1200;
 
       // 画面外削除
