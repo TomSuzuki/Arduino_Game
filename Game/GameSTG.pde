@@ -41,6 +41,11 @@ class STG extends gameMaster {
       if (controller.getButtonL(0) == 1) {
         if (time%2 == 0) for (int i=0; i<2; i++) pBullet.add(new Bullet(x-12+24*i, y, 6, 180, 16, TYPE_PLAYER));
       }
+
+      // 当たり判定
+      for (int i = 0; i < eBullet.size(); i++) if (eBullet.get(i).hitChk(x, y, 18)) {
+        gameFlg = FLG_RESULT;
+      }
     };
 
     // 描画関数
@@ -223,7 +228,22 @@ class STG extends gameMaster {
     case FLG_GAME:
       gameRun();
       break;
+    case FLG_RESULT:
+      gameResult();
+      break;
     }
+  }
+
+  // 結果画面の描画
+  void gameResult() {
+    // 表示
+    background(0);    
+    textFont(font);
+    textSize(32);
+    int y = 0;
+    int add = 38;
+    msg("GAME OVER !!", 12, y+=add, LEFT, TOP, #FFFFFF);
+    msg("SCORE: "+score, 12, y+=add, LEFT, TOP, #FFFFFF);
   }
 
   // スタート前の説明ページの表示
@@ -289,9 +309,6 @@ class STG extends gameMaster {
     // プレイヤーの描画
     player.display();
     displayUserInterface();
-
-    // スコアの加算
-    if (frameCount%60 == 0) score+=10;
   }
 
   // UI
