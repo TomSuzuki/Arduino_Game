@@ -117,14 +117,12 @@ class STG extends gameMaster {
     }
 
     // 処理
-    boolean move() {
+    void move() {
       x = sin(radians(ang))*speed + x;
       y = cos(radians(ang))*speed + y;
 
       // 画面外に行ったら削除する
-      if (constrain(x, -64, 664) != x || constrain(y, -64, 544) != y) return true;
-
-      return false;
+      // ~後で書く~
     }
 
     // 描画
@@ -205,11 +203,11 @@ class STG extends gameMaster {
     if (frameCount%120 == 0) enemy.add(new Enemy());
 
     // 敵の処理
-    for (int i = 0; i < enemy.size(); i++) if (enemy.get(i).move()) enemy.remove(i);
+    for (Enemy e : enemy) e.move();
 
     // 弾の処理
-    for (int i = 0; i < pBullet.size(); i++) if (pBullet.get(i).move()) pBullet.remove(i);
-    for (int i = 0; i < eBullet.size(); i++) if (eBullet.get(i).move()) eBullet.remove(i);
+    for (Bullet b : pBullet) if (b.move()) b.remove();
+    for (Bullet b : eBullet) b.move();
 
     // エフェクトの処理
 
