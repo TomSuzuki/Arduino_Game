@@ -28,7 +28,6 @@ class STG extends gameMaster {
   private final static int EFFECT_NORMAL = 21;
   private final static int EFFECT_MINI = 22;
 
-
   // 弾丸のクラス
   private class Bullet {
     // 変数とか
