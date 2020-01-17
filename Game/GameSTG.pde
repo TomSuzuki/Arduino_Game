@@ -17,8 +17,9 @@ class STG extends gameMaster {
   private final static int FLG_GAME = 7;
   private final static int FLG_RESULT = 9;
 
-  // 敵のタイプ（未適応）
+  // 敵のタイプ
   private final static int ENEMY_001 = 0;
+  private final static int ENEMY_DUMMY = 99;
 
   // 弾のタイプ
   private final static int BULLET_ZERO = 0;
@@ -151,7 +152,7 @@ class STG extends gameMaster {
   // 敵のクラス
   private class Enemy {
     // 変数とか
-    private int x, y, flg, time;
+    private int x, y, flg, time, type;
     private int hp = 12;
     private ArrayList<Bullet> enemyBullet = new ArrayList<Bullet>();
 
@@ -165,35 +166,54 @@ class STG extends gameMaster {
       x = int(random(0, 640));
       y = -64;
       flg = FLG_IN;
+      type = ENEMY_001;
+    }
+
+    Enemy(int tpye) {
+      x = int(random(0, 640));
+      y = -64;
+      flg = FLG_IN;
+      this.type = type;
     }
 
     // 処理
     boolean move() {
-      // プレイヤーの弾の処理
+      // 敵の弾の処理
       for (int i = 0; i < enemyBullet.size(); i++) if (enemyBullet.get(i).move()) enemyBullet.remove(i);
-
-      // 敵本体の処理
-      switch(flg) {
-      case FLG_IN:
-        y+=3;
-        if (time == 60) flg = FLG_ATK;
-        break;
-      case FLG_ATK:
-        if (time%2 == 0) for (int i=0; i<4; i++) enemyBullet.add(new Bullet(x, y, 6, i*360/4 + time, 4, BULLET_ZERO));
-        if (time == 90) flg = FLG_OUT;
-        break;
-      case FLG_OUT:
-        y+=1;
-        if (x<320) x-=2;
-        else x+=2;
-        break;
-      }
-      time++;
 
       // 当たり判定（自分の弾がプレイヤーと接触しているかを判定する）
 
+      // 敵本体の処理
+      switch(type) {
+      case ENEMY_001:
+        switch(flg) {
+        case FLG_IN:
+          y+=3;
+          if (time == 60) flg = FLG_ATK;
+          break;
+        case FLG_ATK:
+          if (time%2 == 0) for (int i=0; i<4; i++) enemyBullet.add(new Bullet(x, y, 6, i*360/4 + time, 4, BULLET_ZERO));
+          if (time == 90) flg = FLG_OUT;
+          break;
+        case FLG_OUT:
+          y+=1;
+          if (x<320) x-=2;
+          else x+=2;
+          break;
+        }
+        break;
+      case ENEMY_DUMMY:
+        if (enemyBullet.size() == 0) return true;
+        return false;
+      }
+      time++;
+
       // 画面外＆体力ゼロを削除
       if (constrain(x, -64, 664) != x || constrain(y, -256, 544) != y || hp <= 0) {
+        if (hp > 0) {
+          type = ENEMY_DUMMY;
+          return false;
+        }
         del_enemy();
         return true;
       }
@@ -207,11 +227,15 @@ class STG extends gameMaster {
       for (Bullet b : enemyBullet) b.display();
 
       // 敵の描画
-      fill(255);
-      noStroke();
-      rotateRect(x, y, 48, 48, time*2);
-      fill(128);
-      rotateRect(x, y, 36, 36, -time*2);
+      switch(type) {
+      case ENEMY_001:
+        fill(255);
+        noStroke();
+        rotateRect(x, y, 48, 48, time*2);
+        fill(128);
+        rotateRect(x, y, 36, 36, -time*2);
+        break;
+      }
     }
 
     // 被弾判定があった時に呼ぶ

@@ -12,8 +12,8 @@ void setup() {
   font = loadFont("./data/rounded-l-mplus-1c-black-48.vlw");
 
   // Arduinoの初期化
-  //controller.arduinoSetup(new String[] {"COM6"});
-  controller.arduinoSetup(controller.getArduinoList());
+  controller.arduinoSetup(new String[] {"COM6"});
+  //controller.arduinoSetup(controller.getArduinoList());
   delay(100);
 
   // テスト用ゲームの初期化
