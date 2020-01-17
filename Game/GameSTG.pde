@@ -1,128 +1,39 @@
+/*
+ * 注意事項
+ * 
+ */
+
 // STG
 class STG extends gameMaster {
 
   // 変数とか
-  private int time, score, gameFlg;
-  private Player player;
-  private ArrayList<Bullet> eBullet = new ArrayList<Bullet>();
-  private ArrayList<Bullet> pBullet = new ArrayList<Bullet>();
+  private int time, gameFlg;
+  private ArrayList<Player> player = new ArrayList<Player>();
   private ArrayList<Enemy> enemy = new ArrayList<Enemy>();
   private ArrayList<Effect> effect = new ArrayList<Effect>();
 
   // ゲームの状態
-  final int FLG_START = 3;
-  final int FLG_GAME = 7;
-  final int FLG_RESULT = 9;
+  private final static int FLG_START = 3;
+  private final static int FLG_GAME = 7;
+  private final static int FLG_RESULT = 9;
 
-  // プレイヤーのクラス
-  private class Player {
-
-    // 変数とか
-    private int x, y;
-    private double xAdd, yAdd;
-
-    // コンストラクタ
-    Player() {
-      x = 320;
-      y = 400;
-    };
-
-    // 移動関数
-    void move() {
-      // 移動
-      xAdd = constraind((xAdd + controller.getAngleX(0)/3)/2, -18, 18);
-      yAdd = constraind((yAdd + controller.getAngleY(0)/3)/2, -18, 18);
-      if (abs((int)xAdd) < 1) xAdd = 0;
-      if (abs((int)yAdd) < 1) yAdd = 0;
-      x = constrain(x+(int)(xAdd * (controller.getButtonR(0) == 1 ? 0.4 : 1)), 0, 640);
-      y = constrain(y+(int)(yAdd * (controller.getButtonR(0) == 1 ? 0.4 : 1)), 0, 480);
-
-      // 攻撃　
-      if (controller.getButtonL(0) == 1) {
-        if (time%2 == 0) for (int i=0; i<2; i++) pBullet.add(new Bullet(x-12+24*i, y, 6, 180, 16, TYPE_PLAYER));
-      }
-
-      // 当たり判定
-      for (int i = 0; i < eBullet.size(); i++) if (eBullet.get(i).hitChk(x, y, 18)) {
-        gameFlg = FLG_RESULT;
-      }
-    };
-
-    // 描画関数
-    void display() {
-      fill(255);
-      ellipse(x, y, 32, 32);
-    };
-  }
-
-  // 敵のクラス
-  private class Enemy {
-    // 変数とか
-    int x, y;
-    int time;
-    int flg;
-    int hp = 12;
-
-    // フラグ管理用
-    private final static int FLG_IN = 0;
-    private final static int FLG_ATK = 1;
-    private final static int FLG_OUT = 2;
-
-    // コンストラクタ
-    Enemy() {
-      x = int(random(0, 640));
-      y = -64;
-      flg = FLG_IN;
-    }
-
-    // 処理
-    boolean move() {
-      switch(flg) {
-      case FLG_IN:
-        y+=3;
-        if (time == 60) flg = FLG_ATK;
-        break;
-      case FLG_ATK:
-        if (time%2 == 0) for (int i=0; i<4; i++) eBullet.add(new Bullet(x, y, 6, i*360/4 + time, 4, TYPE_ZERO));
-        if (time == 90) flg = FLG_OUT;
-        break;
-      case FLG_OUT:
-        y+=1;
-        if (x<320) x-=2;
-        else x+=2;
-        break;
-      }
-      time++;
-
-      // 当たり判定
-      for (int i = 0; i < pBullet.size(); i++) if (pBullet.get(i).hitChk(x, y, 48)) hp-=1;
-      if (hp <= 0) score += 1200;
-
-      // 画面外削除
-      if (constrain(x, -64, 664) != x || constrain(y, -256, 544) != y || hp <= 0) return true;
-
-      return false;
-    }
-
-    // 表示
-    void display() {
-      fill(255);
-      noStroke();
-      rotateRect(x, y, 48, 48, time*2);
-      fill(128);
-      rotateRect(x, y, 36, 36, -time*2);
-    }
-  }
+  // 敵のタイプ（未適応）
+  private final static int ENEMY_001 = 0;
 
   // 弾のタイプ
-  private final static int TYPE_ZERO = 0;
-  private final static int TYPE_PLAYER = 1;
+  private final static int BULLET_ZERO = 0;
+  private final static int BULLET_PLAYER = 128;
+
+  // エフェクトのタイプ
+  private final static int EFFECT_NORMAL = 21;
+  private final static int EFFECT_MINI = 22;
 
   // 弾丸のクラス
   private class Bullet {
     // 変数とか
     float x, y, r, ang, speed;
     int type;
+    int attacker_id;
 
     // コンストラクタ
     Bullet(int x, int y, int r, int ang, int speed, int type) {
@@ -132,13 +43,13 @@ class STG extends gameMaster {
       this.ang = ang;
       this.speed = speed;
       this.type = type;
+      attacker_id = -1;
     }
 
     // 当たり判定用関数
     boolean hitChk(float x, float y, float r) {
       if (Math.sqrt((this.x - x) * (this.x - x) + (this.y - y) * (this.y - y)) < r+this.r) {
-        for (int i = 0; i < 6; i++) effect.add(new Effect(x, y, 60));
-        score+=1;
+        for (int i = 0; i < 6; i++) effect.add(new Effect(x, y, EFFECT_NORMAL));
         return true;
       }
       return false;
@@ -155,35 +66,189 @@ class STG extends gameMaster {
       return false;
     }
 
+    // エフェクトに置き換える
+    void toEffect() {
+      for (int i = 0; i < 6; i++) effect.add(new Effect(x, y, EFFECT_MINI));
+    }
+
     // 描画
     void display() {
       switch(type) {
-      case TYPE_ZERO:
+      case BULLET_ZERO:
         fill(0, 0, 0, 255);
         stroke(255);
         ellipse(x, y, r, r);
         break;
-      case TYPE_PLAYER:
+      case BULLET_PLAYER:
         fill(0, 0, 0, 255);
         stroke(255);
         ellipse(x, y, r/2, r*4);
         break;
       }
+    }
+  }
+
+  // プレイヤーのクラス
+  private class Player {
+
+    // 変数とか
+    private int x, y, score, id, hp;
+    private double xAdd, yAdd;
+    private ArrayList<Bullet> playerBullet = new ArrayList<Bullet>();
+
+    // コンストラクタ
+    Player(int id) {
+      this.id = id;	
+      x = 320;
+      y = 400;
+      score = 0;
+      hp = 300;
     };
+
+    // 移動関数
+    void move() {
+      // プレイヤーの弾の処理
+      for (int i = 0; i < playerBullet.size(); i++) if (playerBullet.get(i).move()) playerBullet.remove(i);
+
+      // 移動
+      xAdd = constraind((xAdd + controller.getAngleX(id)/3)/2, -18, 18);
+      yAdd = constraind((yAdd + controller.getAngleY(id)/3)/2, -18, 18);
+      if (abs((int)xAdd) < 1) xAdd = 0;
+      if (abs((int)yAdd) < 1) yAdd = 0;
+      x = constrain(x+(int)(xAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 640);
+      y = constrain(y+(int)(yAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 480);
+
+      // 攻撃　
+      if (controller.getButtonL(id) == 1) {
+        if (time%2 == 0) for (int i=0; i<2; i++) playerBullet.add(new Bullet(x-12+24*i, y, 6, 180, 16, BULLET_PLAYER));
+      }
+
+      // プレイヤーの弾が敵に接触しているかを判定する
+      for (int i = 0; i < playerBullet.size(); i++) 
+        for (Enemy e : enemy)
+          if (playerBullet.get(i).hitChk(e.x, e.y, 18)) {
+            score+=12;
+            if (e.hit()) score+=1200;
+          }
+    };
+
+    // 描画関数
+    void display() {
+      // 弾の描画
+      for (Bullet b : playerBullet) b.display();
+
+      // プレイヤーの描画
+      fill(255);
+      ellipse(x, y, 32, 32);
+    };
+
+    // 加点関数
+    void addScore(int score) {
+      this.score += score;
+    }
+  }
+
+  // 敵のクラス
+  private class Enemy {
+    // 変数とか
+    private int x, y, flg, time;
+    private int hp = 12;
+    private ArrayList<Bullet> enemyBullet = new ArrayList<Bullet>();
+
+    // 内部フラグ管理用
+    private final static int FLG_IN = 0;
+    private final static int FLG_ATK = 1;
+    private final static int FLG_OUT = 2;
+
+    // コンストラクタ
+    Enemy() {
+      x = int(random(0, 640));
+      y = -64;
+      flg = FLG_IN;
+    }
+
+    // 処理
+    boolean move() {
+      // プレイヤーの弾の処理
+      for (int i = 0; i < enemyBullet.size(); i++) if (enemyBullet.get(i).move()) enemyBullet.remove(i);
+
+      // 敵本体の処理
+      switch(flg) {
+      case FLG_IN:
+        y+=3;
+        if (time == 60) flg = FLG_ATK;
+        break;
+      case FLG_ATK:
+        if (time%2 == 0) for (int i=0; i<4; i++) enemyBullet.add(new Bullet(x, y, 6, i*360/4 + time, 4, BULLET_ZERO));
+        if (time == 90) flg = FLG_OUT;
+        break;
+      case FLG_OUT:
+        y+=1;
+        if (x<320) x-=2;
+        else x+=2;
+        break;
+      }
+      time++;
+
+      // 当たり判定（自分の弾がプレイヤーと接触しているかを判定する）
+
+      // 画面外＆体力ゼロを削除
+      if (constrain(x, -64, 664) != x || constrain(y, -256, 544) != y || hp <= 0) {
+        del_enemy();
+        return true;
+      }
+
+      return false;
+    }
+
+    // 表示
+    void display() {
+      // 弾の描画
+      for (Bullet b : enemyBullet) b.display();
+
+      // 敵の描画
+      fill(255);
+      noStroke();
+      rotateRect(x, y, 48, 48, time*2);
+      fill(128);
+      rotateRect(x, y, 36, 36, -time*2);
+    }
+
+    // 被弾判定があった時に呼ぶ
+    boolean hit() {
+      hp-=1;
+      return hp<=0;
+    }
+
+    // 削除直前に呼ぶ（デストラクタないん？）
+    void del_enemy() {
+      // 所持する弾を全てエフェクトに置き換える（削除は敵オブジェクト行うのでエフェクトの生成のみ行う）
+      for (Bullet b : enemyBullet) b.toEffect();
+    }
   }
 
   // エフェクトのクラス
   private class Effect {
     // 変数とか
-    float x, y, time, speed, ang;
+    private float x, y, time, speed, ang;
+    private int type;
 
     // コンストラクタ
-    Effect(float x, float y, float time) {
+    Effect(float x, float y, int type) {
       this.x = x;
       this.y = y;
-      this.time = time;
+      this.type = type;
+      time = 60;
       ang = random(0, 360);
-      speed = random(2, 8);
+      speed = random(2, 4);
+      switch(type) {
+      case EFFECT_NORMAL:
+        break;
+      case EFFECT_MINI:
+        time = 30;
+        speed = random(1, 2);
+        break;
+      }
     }
 
     // 処理
@@ -198,8 +263,16 @@ class STG extends gameMaster {
     // 描画
     void display() {
       noStroke();
-      fill(255, 255, 255, 24);
-      ellipse(x, y, 12, 12);
+      switch(type) {
+      case EFFECT_NORMAL:
+        fill(255, 255, 255, 24);
+        ellipse(x, y, 12, 12);
+        break;
+      case EFFECT_MINI:
+        fill(255, 255, 255, 24);
+        ellipse(x, y, 8, 8);
+        break;
+      }
     }
   }
 
@@ -212,11 +285,10 @@ class STG extends gameMaster {
   void gameSetup() {
     // ゲーム内変数の初期化
     time = 0;
-    score = 0;
     gameFlg = FLG_START;
 
     // オブジェクトの初期化
-    player = new Player();
+    player.add(new Player(0));
   }
 
   // ゲームの実行
@@ -243,7 +315,7 @@ class STG extends gameMaster {
     int y = 0;
     int add = 38;
     msg("GAME OVER !!", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg("SCORE: "+score, 12, y+=add, LEFT, TOP, #FFFFFF);
+    //msg("SCORE: "+score, 12, y+=add, LEFT, TOP, #FFFFFF);
   }
 
   // スタート前の説明ページの表示
@@ -277,18 +349,15 @@ class STG extends gameMaster {
 
   // ゲーム中の処理
   void gameRun() {
-    // 処理関数の実行
-    player.move();
 
-    // 敵の出現
+    // 敵の出現（あとでゲーム進行クラスに置き換える）
     if (frameCount%120 == 0) enemy.add(new Enemy());
+
+    // プレイヤーの処理
+    for (Player p : player) p.move();
 
     // 敵の処理
     for (int i = 0; i < enemy.size(); i++) if (enemy.get(i).move()) enemy.remove(i);
-
-    // 弾の処理
-    for (int i = 0; i < pBullet.size(); i++) if (pBullet.get(i).move()) pBullet.remove(i);
-    for (int i = 0; i < eBullet.size(); i++) if (eBullet.get(i).move()) eBullet.remove(i);
 
     // エフェクトの処理
     for (int i = 0; i < effect.size(); i++) if (effect.get(i).move()) effect.remove(i);
@@ -299,15 +368,11 @@ class STG extends gameMaster {
     // エフェクトの描画
     for (Effect e : effect) e.display();
 
-    // 弾の描画
-    for (Bullet b : pBullet) b.display();
-    for (Bullet b : eBullet) b.display();
-
     // 敵の描画
     for (Enemy e : enemy) e.display();
 
     // プレイヤーの描画
-    player.display();
+    for (Player p : player) p.display();
     displayUserInterface();
   }
 
@@ -315,6 +380,6 @@ class STG extends gameMaster {
   void displayUserInterface() {
     textFont(font);
     textSize(14);
-    msg("SCORE : "+String.format("%,09d", score), 320, 8, CENTER, TOP, #FFFFFF);
+    //msg("SCORE : "+String.format("%,09d", score), 320, 8, CENTER, TOP, #FFFFFF);
   }
 }
