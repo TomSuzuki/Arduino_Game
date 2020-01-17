@@ -28,6 +28,8 @@ class STG extends gameMaster {
   // エフェクトのタイプ
   private final static int EFFECT_NORMAL = 21;
   private final static int EFFECT_MINI = 22;
+  private final static int EFFECT_BACKGROUND_A = 32;
+  private final static int EFFECT_BACKGROUND_B = 33;
 
   // 弾丸のクラス
   private class Bullet {
@@ -256,17 +258,27 @@ class STG extends gameMaster {
     // 変数とか
     private float x, y, time, speed, ang;
     private int type;
+    private PImage img;
 
     // コンストラクタ
     Effect(float x, float y, int type) {
       this.x = x;
       this.y = y;
       this.type = type;
-      time = 60;
+      time = 0;
       ang = random(0, 360);
-      speed = random(2, 4);
       switch(type) {
+      case EFFECT_BACKGROUND_A:
+        img = loadImage("st01_001.png");
+        speed = 4;
+        break;
+      case EFFECT_BACKGROUND_B:
+        img = loadImage("st01_002.png");
+        speed = 6;
+        break;
       case EFFECT_NORMAL:
+        time = 60;
+        speed = random(2, 4);
         break;
       case EFFECT_MINI:
         time = 30;
@@ -277,22 +289,37 @@ class STG extends gameMaster {
 
     // 処理
     boolean move() {
-      x = sin(radians(ang))*speed + x;
-      y = cos(radians(ang))*speed + y;
-      time--;
-      if (time < 0) return true;
+      switch(type) {
+      case EFFECT_BACKGROUND_A:
+      case EFFECT_BACKGROUND_B:
+        time+=speed;
+        time=time%1280;
+        break;
+      default:
+        x = sin(radians(ang))*speed + x;
+        y = cos(radians(ang))*speed + y;
+        time--;
+        if (time < 0) return true;
+        break;
+      }
       return false;
     }
 
     // 描画
     void display() {
-      noStroke();
       switch(type) {
+      case EFFECT_BACKGROUND_A:
+      case EFFECT_BACKGROUND_B:
+        image(img, 0, time-1280);
+        image(img, 0, time);
+        break;
       case EFFECT_NORMAL:
+        noStroke();
         fill(255, 255, 255, 24);
         ellipse(x, y, 12, 12);
         break;
       case EFFECT_MINI:
+        noStroke();
         fill(255, 255, 255, 24);
         ellipse(x, y, 8, 8);
         break;
@@ -313,6 +340,8 @@ class STG extends gameMaster {
 
     // オブジェクトの初期化
     player.add(new Player(0));
+    effect.add(new Effect(0, 0, EFFECT_BACKGROUND_A));
+    effect.add(new Effect(0, 0, EFFECT_BACKGROUND_B));
   }
 
   // ゲームの実行
