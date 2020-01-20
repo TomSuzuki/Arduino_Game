@@ -112,13 +112,13 @@ void AccelerationClass::reset() {
 }
 
 // getX（float取ると多分いろいろ面倒）
-int AccelerationClass::getAngleX() {
-  return int(now_angle.x - cor_angle.x);
+int AccelerationClass::getAngleY() {
+  return -int(cor_angle.x - now_angle.x - 180) % 360 - 180;
 }
 
 // getY
-int AccelerationClass::getAngleY() {
-  return int(now_angle.y - cor_angle.y);
+int AccelerationClass::getAngleX() {
+  return int(now_angle.y - cor_angle.y + 180 ) % 360 - 180;
 }
 
 // update sensor
