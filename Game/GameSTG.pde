@@ -1,5 +1,6 @@
 /*
  * 注意事項
+ * - final → 数値変えても大丈夫（enumに変えたい）
  * 
  */
 
@@ -33,6 +34,8 @@ class STG extends gameMaster {
   
   // ゲーム進行管理クラス
   private class GmaeFunctions {
+    // 進行状況
+    private final static int GAME_STAGE_001 = 1;
   }
 
   // 弾丸のクラス
@@ -158,7 +161,7 @@ class STG extends gameMaster {
     }
   }
 
-  // 敵のクラス
+  // 敵のクラス（時間があれば各IDごと子クラスに）
   private class Enemy {
     // 変数とか
     private int x, y, flg, time, type;
