@@ -1,5 +1,6 @@
 /*
  * 注意事項
+ * - final → 数値変えても大丈夫（enumに変えたい）
  * 
  */
 
@@ -19,22 +20,31 @@ class STG extends gameMaster {
 
   // 敵のタイプ
   private final static int ENEMY_001 = 0;
+  private final static int ENEMY_002 = 2;
   private final static int ENEMY_DUMMY = 99;
 
   // 弾のタイプ
   private final static int BULLET_ZERO = 0;
-  private final static int BULLET_PLAYER = 128;
+  private final static int BULLET_PLAYER1 = 128;
+  private final static int BULLET_PLAYER2 = BULLET_PLAYER1+1;
 
   // エフェクトのタイプ
   private final static int EFFECT_NORMAL = 21;
   private final static int EFFECT_MINI = 22;
+  private final static int EFFECT_BACKGROUND_A = 32;
+  private final static int EFFECT_BACKGROUND_B = 33;
+
+  // ゲーム進行管理クラス
+  private class GmaeFunctions {
+    // 進行状況
+    private final static int GAME_STAGE_001 = 1;
+  }
 
   // 弾丸のクラス
   private class Bullet {
     // 変数とか
-    float x, y, r, ang, speed;
-    int type;
-    int attacker_id;
+    private float x, y, r, ang, speed;
+    private int type;
 
     // コンストラクタ
     Bullet(int x, int y, int r, int ang, int speed, int type) {
@@ -44,7 +54,6 @@ class STG extends gameMaster {
       this.ang = ang;
       this.speed = speed;
       this.type = type;
-      attacker_id = -1;
     }
 
     // 当たり判定用関数
@@ -80,8 +89,13 @@ class STG extends gameMaster {
         stroke(255);
         ellipse(x, y, r, r);
         break;
-      case BULLET_PLAYER:
-        fill(0, 0, 0, 255);
+      case BULLET_PLAYER1:
+        fill(0, 0, 255, 255);
+        stroke(255);
+        ellipse(x, y, r/2, r*4);
+        break;
+      case BULLET_PLAYER2:
+        fill(255, 0, 0, 255);
         stroke(255);
         ellipse(x, y, r/2, r*4);
         break;
@@ -93,9 +107,10 @@ class STG extends gameMaster {
   private class Player {
 
     // 変数とか
-    private int x, y, score, id, hp;
+    private int x, y, score, id, hp, time;
     private double xAdd, yAdd;
     private ArrayList<Bullet> playerBullet = new ArrayList<Bullet>();
+    private PImage[] img = new PImage[1];
 
     // コンストラクタ
     Player(int id) {
@@ -104,14 +119,28 @@ class STG extends gameMaster {
       y = 400;
       score = 0;
       hp = 300;
+      time = 0;
+      // 画像のロード
+      /*for (int i = 0; i < 4; i++) {
+       img[i] = loadImage("player0"+(i+1)+".png");
+       img[i].resize(48, 48);
+       }*/
+      img[0] = loadImage("デュアル"+(id)+".png");
+      img[0].resize(48, 48);
     };
 
     // 移動関数
     void move() {
+      // 初回のみ
+      if (time == 0) {
+        controller.setLED(id, id);
+      }
+
       // プレイヤーの弾の処理
       for (int i = 0; i < playerBullet.size(); i++) if (playerBullet.get(i).move()) playerBullet.remove(i);
 
       // 移動
+      time++;
       xAdd = constraind((xAdd + controller.getAngleX(id)/3)/2, -18, 18);
       yAdd = constraind((yAdd + controller.getAngleY(id)/3)/2, -18, 18);
       if (abs((int)xAdd) < 1) xAdd = 0;
@@ -121,15 +150,15 @@ class STG extends gameMaster {
 
       // 攻撃　
       if (controller.getButtonL(id) == 1) {
-        if (time%2 == 0) for (int i=0; i<2; i++) playerBullet.add(new Bullet(x-12+24*i, y, 6, 180, 16, BULLET_PLAYER));
+        if (time%2 == 0) for (int i=0; i<2; i++) playerBullet.add(new Bullet(x-8+16*i, y, 6, 180, 16, BULLET_PLAYER1+id));
       }
 
       // プレイヤーの弾が敵に接触しているかを判定する
       for (int i = 0; i < playerBullet.size(); i++) 
         for (Enemy e : enemy)
           if (playerBullet.get(i).hitChk(e.x, e.y, 18)) {
-            score+=12;
-            if (e.hit()) score+=1200;
+            addScore(12);
+            if (e.hit()) addScore(1200);
           }
     };
 
@@ -139,9 +168,18 @@ class STG extends gameMaster {
       for (Bullet b : playerBullet) b.display();
 
       // プレイヤーの描画
+      //image(img[(time/8)%4], x-24, y-24);
+      image(img[0], x-24, y-24);
       fill(255);
-      ellipse(x, y, 32, 32);
+      //ellipse(x, y, 32, 32);
     };
+
+    // HP減少
+    void damage() {
+      controller.setMotorL(id, 2, 250);
+      controller.setMotorR(id, 2, 250);
+      this.hp -= hp;
+    }
 
     // 加点関数
     void addScore(int score) {
@@ -149,7 +187,7 @@ class STG extends gameMaster {
     }
   }
 
-  // 敵のクラス
+  // 敵のクラス（時間があれば各IDごと子クラスに）
   private class Enemy {
     // 変数とか
     private int x, y, flg, time, type;
@@ -169,7 +207,8 @@ class STG extends gameMaster {
       type = ENEMY_001;
     }
 
-    Enemy(int tpye) {
+    // タイプ指定のコンストラクタ
+    Enemy(int type) {
       x = int(random(0, 640));
       y = -64;
       flg = FLG_IN;
@@ -182,9 +221,16 @@ class STG extends gameMaster {
       for (int i = 0; i < enemyBullet.size(); i++) if (enemyBullet.get(i).move()) enemyBullet.remove(i);
 
       // 当たり判定（自分の弾がプレイヤーと接触しているかを判定する）
+      for (Player p : player)
+        for (int i = 0; i < enemyBullet.size(); i++) 
+          if (enemyBullet.get(i).hitChk(p.x, p.y, 12)) {
+            p.damage();
+            enemyBullet.remove(i);
+          }
 
       // 敵本体の処理
       switch(type) {
+      case ENEMY_002:
       case ENEMY_001:
         switch(flg) {
         case FLG_IN:
@@ -192,7 +238,10 @@ class STG extends gameMaster {
           if (time == 60) flg = FLG_ATK;
           break;
         case FLG_ATK:
-          if (time%2 == 0) for (int i=0; i<4; i++) enemyBullet.add(new Bullet(x, y, 6, i*360/4 + time, 4, BULLET_ZERO));
+          if (time%2 == 0) for (int i=0; i<8; i++) {
+            if (type == ENEMY_001) enemyBullet.add(new Bullet(x, y, 6, i*360/8 + time, 4, BULLET_ZERO));
+            if (type == ENEMY_002) enemyBullet.add(new Bullet(x, y, 6, i*360/8 - time, 4, BULLET_ZERO));
+          }
           if (time == 90) flg = FLG_OUT;
           break;
         case FLG_OUT:
@@ -235,6 +284,13 @@ class STG extends gameMaster {
         fill(128);
         rotateRect(x, y, 36, 36, -time*2);
         break;
+      case ENEMY_002:
+        fill(255);
+        noStroke();
+        rotateRect(x, y, 48, 48, time*2);
+        fill(128, 128, 0);
+        rotateRect(x, y, 36, 36, -time*2);
+        break;
       }
     }
 
@@ -256,17 +312,27 @@ class STG extends gameMaster {
     // 変数とか
     private float x, y, time, speed, ang;
     private int type;
+    private PImage img;
 
     // コンストラクタ
     Effect(float x, float y, int type) {
       this.x = x;
       this.y = y;
       this.type = type;
-      time = 60;
+      time = 0;
       ang = random(0, 360);
-      speed = random(2, 4);
       switch(type) {
+      case EFFECT_BACKGROUND_A:
+        img = loadImage("st01_001.png");
+        speed = 4;
+        break;
+      case EFFECT_BACKGROUND_B:
+        img = loadImage("st01_002.png");
+        speed = 6;
+        break;
       case EFFECT_NORMAL:
+        time = 60;
+        speed = random(2, 4);
         break;
       case EFFECT_MINI:
         time = 30;
@@ -277,22 +343,37 @@ class STG extends gameMaster {
 
     // 処理
     boolean move() {
-      x = sin(radians(ang))*speed + x;
-      y = cos(radians(ang))*speed + y;
-      time--;
-      if (time < 0) return true;
+      switch(type) {
+      case EFFECT_BACKGROUND_A:
+      case EFFECT_BACKGROUND_B:
+        time+=speed;
+        time=time%1280;
+        break;
+      default:
+        x = sin(radians(ang))*speed + x;
+        y = cos(radians(ang))*speed + y;
+        time--;
+        if (time < 0) return true;
+        break;
+      }
       return false;
     }
 
     // 描画
     void display() {
-      noStroke();
       switch(type) {
+      case EFFECT_BACKGROUND_A:
+      case EFFECT_BACKGROUND_B:
+        image(img, 0, time-1280);
+        image(img, 0, time);
+        break;
       case EFFECT_NORMAL:
+        noStroke();
         fill(255, 255, 255, 24);
         ellipse(x, y, 12, 12);
         break;
       case EFFECT_MINI:
+        noStroke();
         fill(255, 255, 255, 24);
         ellipse(x, y, 8, 8);
         break;
@@ -313,6 +394,9 @@ class STG extends gameMaster {
 
     // オブジェクトの初期化
     player.add(new Player(0));
+    player.add(new Player(1));
+    effect.add(new Effect(0, 0, EFFECT_BACKGROUND_A));
+    effect.add(new Effect(0, 0, EFFECT_BACKGROUND_B));
   }
 
   // ゲームの実行
@@ -375,7 +459,8 @@ class STG extends gameMaster {
   void gameRun() {
 
     // 敵の出現（あとでゲーム進行クラスに置き換える）
-    if (frameCount%120 == 0) enemy.add(new Enemy());
+    if (frameCount%120 == 0) enemy.add(new Enemy(ENEMY_001));
+    if (frameCount%120 == 0) enemy.add(new Enemy(ENEMY_002));
 
     // プレイヤーの処理
     for (Player p : player) p.move();

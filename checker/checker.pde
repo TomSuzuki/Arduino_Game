@@ -2,8 +2,8 @@
 
 void setup() {
   size(640, 480);
-  controller.arduinoSetup(new String[] {"COM6"});
-  //controller.arduinoSetup(controller.getArduinoList());
+  //controller.arduinoSetup(new String[] {"COM6"});
+  controller.arduinoSetup(controller.getArduinoList());
   delay(1000);
   controller.setLED(0, 0);
   //controller.setLED(1, 1);
@@ -13,7 +13,7 @@ void draw() {
   // 値の表示
   background(0);
   stroke(255);
-  for (int i = 0; i < 1; i++) {
+  for (int i = 0; i < 2; i++) {
     pos(5 + 320*i, 20, 18);
     msg("ArduinoName = " + controller.getArduinoName(i));
     msg("");

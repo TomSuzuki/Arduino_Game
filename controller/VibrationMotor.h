@@ -4,7 +4,7 @@ class VMX {
 
   private:
     int pin = A0;
-    int power[4] = {0, 48, 128, 255};  // モーターの強さの定義
+    int power[4] = {0, 72, 128, 255};  // モーターの強さの定義
     float offCounter = 0;
     const int frameRate = 1000 / 60;  // updateを呼ぶ間隔
 
