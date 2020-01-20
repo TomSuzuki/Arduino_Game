@@ -146,6 +146,11 @@ class STG extends gameMaster {
       fill(255);
       ellipse(x, y, 32, 32);
     };
+    
+    // HP減少
+    void damage(){
+      this.hp -= hp;
+    }
 
     // 加点関数
     void addScore(int score) {
