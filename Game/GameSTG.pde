@@ -30,13 +30,16 @@ class STG extends gameMaster {
   private final static int EFFECT_MINI = 22;
   private final static int EFFECT_BACKGROUND_A = 32;
   private final static int EFFECT_BACKGROUND_B = 33;
+  
+  // ゲーム進行管理クラス
+  private class GmaeFunctions {
+  }
 
   // 弾丸のクラス
   private class Bullet {
     // 変数とか
-    float x, y, r, ang, speed;
-    int type;
-    int attacker_id;
+    private float x, y, r, ang, speed;
+    private int type;
 
     // コンストラクタ
     Bullet(int x, int y, int r, int ang, int speed, int type) {
@@ -46,7 +49,6 @@ class STG extends gameMaster {
       this.ang = ang;
       this.speed = speed;
       this.type = type;
-      attacker_id = -1;
     }
 
     // 当たり判定用関数
@@ -130,8 +132,8 @@ class STG extends gameMaster {
       for (int i = 0; i < playerBullet.size(); i++) 
         for (Enemy e : enemy)
           if (playerBullet.get(i).hitChk(e.x, e.y, 18)) {
-            score+=12;
-            if (e.hit()) score+=1200;
+            addScore(12);
+            if (e.hit()) addScore(1200);
           }
     };
 
@@ -171,6 +173,7 @@ class STG extends gameMaster {
       type = ENEMY_001;
     }
 
+    // タイプ指定のコンストラクタ
     Enemy(int tpye) {
       x = int(random(0, 640));
       y = -64;
