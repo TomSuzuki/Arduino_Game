@@ -52,10 +52,14 @@ class STG extends gameMaster {
     // 変数とか
     private int type, remainingTime;
     private final int EnemyList[] = {ENEMY_001, ENEMY_002};	// ランダム出現の敵のリスト
+    private PImage Img_GameFrame;
 
     // コンストラクタ
     GameFunctions(int type) {
       this.type = type;
+
+      // ロード
+      Img_GameFrame = loadImage("./gameFrame.png");
 
       // オブジェクトの初期化
       int maxHP = 100;
@@ -77,7 +81,7 @@ class STG extends gameMaster {
 
       // 時間の進行
       remainingTime--;
-	  if(remainingTime == 0) gameFlg = FLG_RESULT;
+      if (remainingTime == 0) gameFlg = FLG_RESULT;
     }
 
     // UI
@@ -101,15 +105,7 @@ class STG extends gameMaster {
     // ゲームのフレーム
     void displayFrame() {
       // フレーム本体
-      noStroke();
-      fill(#EFEFEF);
-      rect(0, 0, 640, 50);
-      rect(0, 0, 5, 480);
-      rect(635, 0, 5, 480);
-      rect(0, 475, 640, 5);
-      stroke(255);
-      fill(0, 0, 0, 0);
-      rect(5, 50, 630, 425);
+      image(Img_GameFrame, 0, 0);
     }
   }
 
@@ -261,9 +257,12 @@ class STG extends gameMaster {
 
     // UI表示
     void displayUserInterface() {
+	  int x = id*320;
+	  noStroke();
+      fill(255, 255, 255, 172);
+      rect(5+x, 5, 310, 40);
       textAlign(LEFT, TOP);
       textFont(createFont("Osaka", 16, false));
-      int x = id*320;
       stroke(#0000FF);
       if (id == 1) stroke(#FF0000);
       strokeWeight(3);
