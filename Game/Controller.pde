@@ -6,7 +6,7 @@
  * controller.arduinoSetup(Arduinoのリスト);
  * 
  * // その他の関数
- * 【未実装】getArduinoList();  // Arduinoのリストを取得
+ * 【未実装】getArduinoList();  // Arduinoのリストを取得（macのみ自動で判別可能）
  *
  * // 情報取得用関数（iはプレイヤーのID）
  * controller.getAngleX(i);

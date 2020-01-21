@@ -604,11 +604,11 @@ class STG extends gameMaster {
         centerRect(480, 240, 180, 40);
         if (flg) gameFlg = FLG_SETUP_BATTLE;
       }
-      if (c.hitChk(320, 340, 180, 40)) {
+      if (c.hitChk(320, 340, 220, 40)) {
         centerRect(320, 340, 220, 40);
         if (flg) gameFlg = FLG_SETUP_RANKING;
       }
-      if (c.hitChk(320, 400, 180, 40)) {
+      if (c.hitChk(320, 400, 120, 40)) {
         centerRect(320, 400, 120, 40);
         if (flg) gameFlg = FLG_EXIT;
       }
