@@ -35,7 +35,7 @@ class STG extends gameMaster {
   // 弾のタイプ
   private final static int BULLET_ZERO = 0;
   private final static int BULLET_PLAYER1 = 1167;
-  private final static int BULLET_PLAYER2 = BULLET_PLAYER1+1;
+  private final static int BULLET_PLAYER2 = 1168;
 
   // エフェクトのタイプ
   private final static int EFFECT_NORMAL = 21;
@@ -95,11 +95,15 @@ class STG extends gameMaster {
 
       // 表示
       String s = "対戦";
-      if (type == GAME_TYPE_COOPERATION) s = "協力";
+	  color c = #FF2222;
+      if (type == GAME_TYPE_COOPERATION) {
+		  s = "協力";
+		  c = #2222FF;
+	  }
       textSize(14);
-      msg(s, 320, 55, CENTER, TOP, #FFFFFF);
+      msg(s, 320, 55, CENTER, TOP, #FFFFFF, c, 1);
       textSize(26);
-      msg(""+(1+remainingTime/60), 630, 474, RIGHT, BOTTOM, #FFFFFF);
+      msg(""+(1+remainingTime/60), 630, 474, RIGHT, BOTTOM, #FFFFFF, #222222, 1);
     }
 
     // ゲームのフレーム
@@ -219,7 +223,7 @@ class STG extends gameMaster {
 
       // 攻撃　
       if (controller.getButtonL(id) == 1) {
-        if (time%2 == 0) for (int i=0; i<2; i++) playerBullet.add(new Bullet(x-8+16*i, y, 6, 180, 16, BULLET_PLAYER1+id));
+        if (time%2 == 0) for (int i=0; i<2; i++) playerBullet.add(new Bullet(x-8+16*i, y, 6, 180, 16, id == 0 ? BULLET_PLAYER1 : BULLET_PLAYER2));
       }
 
       // プレイヤーの弾が敵に接触しているかを判定する
@@ -257,12 +261,12 @@ class STG extends gameMaster {
 
     // UI表示
     void displayUserInterface() {
-	  int x = id*320;
-	  noStroke();
+      int x = id*320;
+      noStroke();
       fill(255, 255, 255, 172);
       rect(5+x, 5, 310, 40);
       textAlign(LEFT, TOP);
-      textFont(createFont("Osaka", 16, false));
+      textSize(16);
       stroke(#0000FF);
       if (id == 1) stroke(#FF0000);
       strokeWeight(3);
@@ -518,6 +522,25 @@ class STG extends gameMaster {
     }
 
     time++;
+
+    // デバッグ用の情報
+    if (modeDebug) {
+      int y = 5-12;
+      textSize(12);
+      msg("[STG]", 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("gameFlg = "+gameFlg, 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("time= "+time, 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("", 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("[GameFunctions]", 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("player.size() = "+player.size(), 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("effect.size() = "+effect.size(), 5, y+=15, LEFT, TOP, #FFFFFF);
+	  msg("enemy.size() = "+enemy.size(), 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("ALL_objects = "+(player.size()+effect.size()+enemy.size()), 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("", 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("[Processing]", 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("frameCount = "+frameCount, 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("frameRate = "+frameRate, 5, y+=15, LEFT, TOP, #FFFFFF);
+    }
   }
 
   // 結果画面の描画

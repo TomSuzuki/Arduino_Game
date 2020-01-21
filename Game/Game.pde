@@ -1,4 +1,6 @@
 
+final boolean modeDebug = true;
+
 // デフォルトフォント（これ以外を使いたい場合はメモリの状況を確認する）
 PFont font;
 
