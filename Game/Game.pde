@@ -3,13 +3,16 @@
 PFont font;
 
 // ゲームの生成
-STG g1 = new STG();
+STG g1;
 
 void setup() {
   // ウィンドウ関連
   size(640, 480);
   surface.setTitle("Game Test mk.3");
   font = loadFont("./data/rounded-l-mplus-1c-black-48.vlw");
+
+  // ゲームの生成
+  g1 = new STG();
 
   // Arduinoの初期化
   //controller.arduinoSetup(new String[] {"COM6"});

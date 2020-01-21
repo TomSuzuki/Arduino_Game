@@ -12,11 +12,20 @@ class STG extends gameMaster {
   private ArrayList<Player> player = new ArrayList<Player>();
   private ArrayList<Enemy> enemy = new ArrayList<Enemy>();
   private ArrayList<Effect> effect = new ArrayList<Effect>();
+  private GameFunctions gameFunctions;
+
+  // 画像、音声用
+  private PImage Img_StartBack;
 
   // ゲームの状態
   private final static int FLG_START = 3;
   private final static int FLG_GAME = 7;
   private final static int FLG_RESULT = 9;
+  private final static int FLG_SETUP_BATTLE = 123;
+  private final static int FLG_SETUP_COOPERATION = 124;
+  private final static int FLG_EXIT = 200;
+  private final static int FLG_SETUP_RANKING = 300;
+  private final static int FLG_RANKING = 301;
 
   // 敵のタイプ
   private final static int ENEMY_001 = 0;
@@ -25,7 +34,7 @@ class STG extends gameMaster {
 
   // 弾のタイプ
   private final static int BULLET_ZERO = 0;
-  private final static int BULLET_PLAYER1 = 128;
+  private final static int BULLET_PLAYER1 = 1167;
   private final static int BULLET_PLAYER2 = BULLET_PLAYER1+1;
 
   // エフェクトのタイプ
@@ -34,10 +43,74 @@ class STG extends gameMaster {
   private final static int EFFECT_BACKGROUND_A = 32;
   private final static int EFFECT_BACKGROUND_B = 33;
 
+  // ゲームの種類
+  private final static int GAME_TYPE_BATTLE = 1;
+  private final static int GAME_TYPE_COOPERATION = 2;
+
   // ゲーム進行管理クラス
-  private class GmaeFunctions {
-    // 進行状況
-    private final static int GAME_STAGE_001 = 1;
+  private class GameFunctions {
+    // 変数とか
+    private int type, remainingTime;
+    private final int EnemyList[] = {ENEMY_001, ENEMY_002};	// ランダム出現の敵のリスト
+
+    // コンストラクタ
+    GameFunctions(int type) {
+      this.type = type;
+
+      // オブジェクトの初期化
+      int maxHP = 100;
+      if (type == GAME_TYPE_COOPERATION) maxHP = 300;
+      player.add(new Player(0, maxHP));
+      player.add(new Player(1, maxHP));
+      effect.add(new Effect(0, 0, EFFECT_BACKGROUND_A));
+      effect.add(new Effect(0, 0, EFFECT_BACKGROUND_B));
+
+      // ゲーム初期化
+      remainingTime = 60*30;
+    }
+
+    // ゲームの進行
+    void x25() {
+      // 敵の出現
+      if (frameCount%60 == 0) enemy.add(new Enemy(ENEMY_001));
+      if (frameCount%60 == 30) enemy.add(new Enemy(ENEMY_002));
+
+      // 時間の進行
+      remainingTime--;
+	  if(remainingTime == 0) gameFlg = FLG_RESULT;
+    }
+
+    // UI
+    void displayUserInterface() {
+      // FPS
+      textSize(12);
+      msg("FPS "+String.format("%2.3f", frameRate), 8, 474, LEFT, BOTTOM, #FFFFFF);
+
+      // プレイヤーUI
+      for (Player p : player) p.displayUserInterface();
+
+      // 表示
+      String s = "対戦";
+      if (type == GAME_TYPE_COOPERATION) s = "協力";
+      textSize(14);
+      msg(s, 320, 55, CENTER, TOP, #FFFFFF);
+      textSize(26);
+      msg(""+(1+remainingTime/60), 630, 474, RIGHT, BOTTOM, #FFFFFF);
+    }
+
+    // ゲームのフレーム
+    void displayFrame() {
+      // フレーム本体
+      noStroke();
+      fill(#EFEFEF);
+      rect(0, 0, 640, 50);
+      rect(0, 0, 5, 480);
+      rect(635, 0, 5, 480);
+      rect(0, 475, 640, 5);
+      stroke(255);
+      fill(0, 0, 0, 0);
+      rect(5, 50, 630, 425);
+    }
   }
 
   // 弾丸のクラス
@@ -105,20 +178,20 @@ class STG extends gameMaster {
 
   // プレイヤーのクラス
   private class Player {
-
     // 変数とか
-    private int x, y, score, id, hp, time;
+    private int x, y, score, id, hp, time, maxHP;
     private double xAdd, yAdd;
     private ArrayList<Bullet> playerBullet = new ArrayList<Bullet>();
     private PImage[] img = new PImage[1];
 
     // コンストラクタ
-    Player(int id) {
+    Player(int id, int maxHP) {
       this.id = id;	
+      this.maxHP = maxHP;
       x = 320;
       y = 400;
       score = 0;
-      hp = 300;
+      hp = maxHP;
       time = 0;
       // 画像のロード
       /*for (int i = 0; i < 4; i++) {
@@ -145,8 +218,8 @@ class STG extends gameMaster {
       yAdd = constraind((yAdd + controller.getAngleY(id)/3)/2, -18, 18);
       if (abs((int)xAdd) < 1) xAdd = 0;
       if (abs((int)yAdd) < 1) yAdd = 0;
-      x = constrain(x+(int)(xAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 640);
-      y = constrain(y+(int)(yAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 480);
+      x = constrain(x+(int)(xAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 20, 620);
+      y = constrain(y+(int)(yAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 50, 475);
 
       // 攻撃　
       if (controller.getButtonL(id) == 1) {
@@ -178,12 +251,34 @@ class STG extends gameMaster {
     void damage() {
       controller.setMotorL(id, 2, 250);
       controller.setMotorR(id, 2, 250);
-      this.hp -= hp;
+      hp -= 1;
     }
 
     // 加点関数
     void addScore(int score) {
       this.score += score;
+    }
+
+    // UI表示
+    void displayUserInterface() {
+      textAlign(LEFT, TOP);
+      textFont(createFont("Osaka", 16, false));
+      int x = id*320;
+      stroke(#0000FF);
+      if (id == 1) stroke(#FF0000);
+      strokeWeight(3);
+      fill(#222222);
+      rect(x+5, 5, 40, 40);  // キャラクターアイコンに置き換える？
+      strokeWeight(1);
+      text("PLAYER "+(id+1), x+55, 10);
+      textAlign(RIGHT, TOP);
+      text(String.format("%,d", score), x+310, 10);
+      fill(#222222);
+      stroke(#444444);
+      rect(x+49, 35, 261, 3);
+      fill(#00FF00);
+      noStroke();
+      rect(x+50, 36, 260*hp/maxHP, 2);
     }
   }
 
@@ -209,8 +304,8 @@ class STG extends gameMaster {
 
     // タイプ指定のコンストラクタ
     Enemy(int type) {
-      x = int(random(0, 640));
-      y = -64;
+      x = int(random(40, 600));
+      y = -48;
       flg = FLG_IN;
       this.type = type;
     }
@@ -384,6 +479,7 @@ class STG extends gameMaster {
   // コンストラクタ
   STG() {
     super("STG for Debug");
+    gameStart_init();
   }
 
   // ゲームの初期化
@@ -391,12 +487,8 @@ class STG extends gameMaster {
     // ゲーム内変数の初期化
     time = 0;
     gameFlg = FLG_START;
-
-    // オブジェクトの初期化
-    player.add(new Player(0));
-    player.add(new Player(1));
-    effect.add(new Effect(0, 0, EFFECT_BACKGROUND_A));
-    effect.add(new Effect(0, 0, EFFECT_BACKGROUND_B));
+    controller.setZero(0);
+    controller.setZero(1);
   }
 
   // ゲームの実行
@@ -411,7 +503,22 @@ class STG extends gameMaster {
     case FLG_RESULT:
       gameResult();
       break;
+    case FLG_SETUP_BATTLE:
+      gameFunctions = new GameFunctions(GAME_TYPE_BATTLE);
+      gameFlg = FLG_GAME;
+      break;
+    case FLG_SETUP_COOPERATION:
+      gameFunctions = new GameFunctions(GAME_TYPE_COOPERATION);
+      gameFlg = FLG_GAME;
+      break;
+    case FLG_EXIT:
+      exit();
+    default:
+      println("【ゲーム】致命的なエラーもしくは実装されていない機能です。 Error-000"+gameFlg);
+      exit();
     }
+
+    time++;
   }
 
   // 結果画面の描画
@@ -426,41 +533,108 @@ class STG extends gameMaster {
     //msg("SCORE: "+score, 12, y+=add, LEFT, TOP, #FFFFFF);
   }
 
+  // スタートページ用カーソルクラス
+  private class Cursor {
+    private int id, time, x, y;
+    private double xAdd, yAdd;
+
+    Cursor(int id) {
+      this.id = id;
+      time = 0;
+      x = 320;
+      y = 240;
+    }
+
+    boolean move() {
+      time++;
+      xAdd = constraind((xAdd + controller.getAngleX(id)/3)/2, -18, 18);
+      yAdd = constraind((yAdd + controller.getAngleY(id)/3)/2, -18, 18);
+      if (abs((int)xAdd) < 1) xAdd = 0;
+      if (abs((int)yAdd) < 1) yAdd = 0;
+      x = constrain(x+(int)(xAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 640);
+      y = constrain(y+(int)(yAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 480);
+      if (controller.getButtonL(id) == 1 || controller.getButtonR(id) == 1) return true;
+      return false;
+    }
+
+    void display() {
+      stroke(#0000FF);
+      if (id == 1) stroke(#FF0000);
+      strokeWeight(3);
+      noFill();
+      ellipse(x, y, 32, 32);
+      line(x-20, y, x+20, y);
+      line(x, y-20, x, y+20);
+      strokeWeight(1);
+    }
+
+    // 中心座標からの四角形で当たり判定を行う
+    boolean hitChk(int x, int y, int w, int h) {
+      if (this.x > x-w/2 && this.x < x+w/2 && this.y > y-h/2 && this.y < y+h/2) return true;
+      return false;
+    }
+  }
+
+  // スタートページ準備関数
+  void gameStart_init() {
+    // 画像のロード
+    Img_StartBack = loadImage("./data/title.png");
+
+    // カーソルの生成
+    cursor[0] = new Cursor(0);
+    cursor[1] = new Cursor(1);
+  }
+
   // スタート前の説明ページの表示
+  private Cursor[] cursor = new Cursor[2];
   void gameStart() {
     // 表示
-    background(0);    
-    textFont(font);
-    textSize(12);
-    int y = 0;
-    int add = 16;
-    msg("STG", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg(" - このゲームは一人用です.", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg(" - デバッグ用ゲームです.", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg(" - 攻撃は自動で行います.", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg("", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg("操作方法", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg(" - Lボタン: 攻撃タイプの変更", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg(" - Rボタン: 低速移動", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg(" - 傾き: 移動", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg(" - ディスプレイ: 現在の攻撃タイプの表示", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg("", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg("", 12, y+=add, LEFT, TOP, #FFFFFF);
-    msg("LボタンとRボタンを同時押しでゲームを開始します.", 12, y+=add, LEFT, TOP, #FFFFFF);
+    background(0);
+    image(Img_StartBack, 0, 0);
 
-    // ボタン同時押しでゲーム画面に進む
-    if (controller.getButtonL(0) == 1 && controller.getButtonR(0) == 1) {
-      controller.setZero(0);
-      gameFlg = FLG_GAME;
-    }
+    // フォーカスの処理
+    for (Cursor c : cursor) {
+      boolean flg = c.move();
+      fill(255, 255, 255, frameCount%6 < 2 ? 128 : 96);
+      noStroke();
+      if (c.hitChk(160, 240, 180, 40)) {
+        centerRect(160, 240, 180, 40);
+        if (flg) gameFlg = FLG_SETUP_COOPERATION;
+      }
+      if (c.hitChk(480, 240, 180, 40)) {
+        centerRect(480, 240, 180, 40);
+        if (flg) gameFlg = FLG_SETUP_BATTLE;
+      }
+      if (c.hitChk(320, 340, 180, 40)) {
+        centerRect(320, 340, 220, 40);
+        if (flg) gameFlg = FLG_SETUP_RANKING;
+      }
+      if (c.hitChk(320, 400, 180, 40)) {
+        centerRect(320, 400, 120, 40);
+        if (flg) gameFlg = FLG_EXIT;
+      }
+      if (flg) controller.setZero(0);
+    };
+
+    // テキスト
+    textFont(font);
+    textSize(64);
+    msg("Gyro STG", 320, 100, CENTER, CENTER, #FFFFFF);
+    textSize(32);
+    msg("協力モード", 160, 240, CENTER, CENTER, #DDDDDD);
+    msg("対戦モード", 480, 240, CENTER, CENTER, #DDDDDD);
+    msg("スコアを見る", 320, 340, CENTER, CENTER, #DDDDDD);
+    msg("終了", 320, 400, CENTER, CENTER, #DDDDDD);
+
+    // フォーカスの描画
+    for (Cursor c : cursor) c.display();
   };
 
   // ゲーム中の処理
   void gameRun() {
 
-    // 敵の出現（あとでゲーム進行クラスに置き換える）
-    if (frameCount%120 == 0) enemy.add(new Enemy(ENEMY_001));
-    if (frameCount%120 == 0) enemy.add(new Enemy(ENEMY_002));
+    // ゲーム進行クラス
+    gameFunctions.x25();
 
     // プレイヤーの処理
     for (Player p : player) p.move();
@@ -482,13 +656,9 @@ class STG extends gameMaster {
 
     // プレイヤーの描画
     for (Player p : player) p.display();
-    displayUserInterface();
-  }
 
-  // UI
-  void displayUserInterface() {
-    textFont(font);
-    textSize(14);
-    //msg("SCORE : "+String.format("%,09d", score), 320, 8, CENTER, TOP, #FFFFFF);
+    // UI関連
+    gameFunctions.displayFrame();
+    gameFunctions.displayUserInterface();
   }
 }

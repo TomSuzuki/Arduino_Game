@@ -20,4 +20,5 @@ class gameMaster {
   // タイトル画面表示時に呼ばれる
   void gameTitle() {
   }
+  
 }

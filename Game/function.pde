@@ -21,3 +21,7 @@ void rotateRect(int x, int y, int w, int h, int ang) {
   rect(-w/2, -h/2, w, h);
   popMatrix();
 }
+
+void centerRect(int x, int y, int w, int h) {
+  rect(x-w/2, y-h/2, w, h);
+}
