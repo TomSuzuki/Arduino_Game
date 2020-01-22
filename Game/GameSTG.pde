@@ -53,6 +53,8 @@ class STG extends gameMaster {
   private final static int EFFECT_MINI = 22;
   private final static int EFFECT_BACKGROUND_A = 32;
   private final static int EFFECT_BACKGROUND_B = 33;
+  private final static int EFFECT_PLAYERIMG_1 = 45;
+  private final static int EFFECT_PLAYERIMG_2 = 46;
 
   // ゲームの種類
   private final static int GAME_TYPE_BATTLE = 1;
@@ -290,11 +292,12 @@ class STG extends gameMaster {
       if (pButtonR == 0 && controller.getButtonR(id)== 1) {
         pButtonR = 1;
 
-		// 切り替え本体
+        // 切り替え本体
         typeATK+=1;
         if (typeATK > AKT_List.length) typeATK = AKT_List[0];
 
-		// 切り替えエフェクトの出現
+        // 切り替えエフェクトの出現
+        effect.add(new Effect(0, 0, id == 0 ? EFFECT_PLAYERIMG_1 : EFFECT_PLAYERIMG_2));
       }
       if (controller.getButtonR(id)== 0)  pButtonR = 0;
 
@@ -548,6 +551,14 @@ class STG extends gameMaster {
         time = 30;
         speed = random(1, 2);
         break;
+      case EFFECT_PLAYERIMG_1:
+        this.x = 20;
+        this.y = 80;
+        break;
+      case EFFECT_PLAYERIMG_2:
+        this.x = 620-212;
+        this.y = 80;
+        break;
       }
     }
 
@@ -558,6 +569,12 @@ class STG extends gameMaster {
       case EFFECT_BACKGROUND_B:
         time+=speed;
         time=time%1280;
+        break;
+      case EFFECT_PLAYERIMG_1:
+      case EFFECT_PLAYERIMG_2:
+        time++;
+		y++;
+        if (time > 80) return true;
         break;
       default:
         x = sin(radians(ang))*speed + x;
@@ -586,6 +603,11 @@ class STG extends gameMaster {
         noStroke();
         fill(255, 255, 255, 24);
         ellipse(x, y, 8, 8);
+        break;
+      case EFFECT_PLAYERIMG_1:
+        tint(255.0, 255*(60-time)/40);
+        image(Img_Player0, x, y);
+        noTint();
         break;
       }
     }
