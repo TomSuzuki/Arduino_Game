@@ -9,11 +9,11 @@ class STG extends gameMaster {
 
   // 変数とか
   private int time, gameFlg;
+  private float fps;
   private ArrayList<Player> player = new ArrayList<Player>();
   private ArrayList<Enemy> enemy = new ArrayList<Enemy>();
   private ArrayList<Effect> effect = new ArrayList<Effect>();
   private GameFunctions gameFunctions;
-  private float fps;
 
   // 画像、音声用
   private PImage Img_StartBack;
@@ -51,8 +51,8 @@ class STG extends gameMaster {
   // ゲーム進行管理クラス
   private class GameFunctions {
     // 変数とか
+    private final int EnemyList[] = {ENEMY_001, ENEMY_002};  // ランダム出現の敵のリスト
     private int type, remainingTime;
-    private final int EnemyList[] = {ENEMY_001, ENEMY_002};	// ランダム出現の敵のリスト
     private PImage Img_GameFrame;
 
     // コンストラクタ
@@ -77,8 +77,7 @@ class STG extends gameMaster {
     // ゲームの進行
     void x25() {
       // 敵の出現
-      if (frameCount%60 == 0) enemy.add(new Enemy(ENEMY_001));
-      if (frameCount%60 == 30) enemy.add(new Enemy(ENEMY_002));
+      if (frameCount%45 == 0) enemy.add(new Enemy(EnemyList[int(random(0, EnemyList.length))]));
 
       // 時間の進行
       remainingTime--;
@@ -88,7 +87,7 @@ class STG extends gameMaster {
     // UI
     void displayUserInterface() {
       // FPS
-	  if(frameCount%60 == 0) fps = frameRate;
+      if (frameCount%60 == 0) fps = frameRate;
       textSize(12);
       msg("FPS "+String.format("%2.1f", fps), 8, 474, LEFT, BOTTOM, #FFFFFF);
 
@@ -97,11 +96,11 @@ class STG extends gameMaster {
 
       // 表示
       String s = "対戦";
-	  color c = #FF2222;
+      color c = #FF2222;
       if (type == GAME_TYPE_COOPERATION) {
-		  s = "協力";
-		  c = #2222FF;
-	  }
+        s = "協力";
+        c = #2222FF;
+      }
       textSize(14);
       msg(s, 320, 55, CENTER, TOP, #FFFFFF, c, 1);
       textSize(26);
@@ -536,7 +535,7 @@ class STG extends gameMaster {
       msg("[GameFunctions]", 5, y+=15, LEFT, TOP, #FFFFFF);
       msg("player.size() = "+player.size(), 5, y+=15, LEFT, TOP, #FFFFFF);
       msg("effect.size() = "+effect.size(), 5, y+=15, LEFT, TOP, #FFFFFF);
-	  msg("enemy.size() = "+enemy.size(), 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("enemy.size() = "+enemy.size(), 5, y+=15, LEFT, TOP, #FFFFFF);
       msg("ALL_objects = "+(player.size()+effect.size()+enemy.size()), 5, y+=15, LEFT, TOP, #FFFFFF);
       msg("", 5, y+=15, LEFT, TOP, #FFFFFF);
       msg("[Processing]", 5, y+=15, LEFT, TOP, #FFFFFF);

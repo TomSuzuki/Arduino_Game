@@ -1,4 +1,4 @@
-
+// デバッグ用フラグ
 final boolean modeDebug = true;
 
 // デフォルトフォント（これ以外を使いたい場合はメモリの状況を確認する）
@@ -21,7 +21,7 @@ void setup() {
   controller.arduinoSetup(controller.getArduinoList());  // mac用（自動で判別）
   delay(100);
 
-  // テスト用ゲームの初期化
+  // ゲームの初期化
   g1.gameSetup();
 }
 
