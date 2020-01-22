@@ -37,6 +37,14 @@ class STG extends gameMaster {
   private final static int BULLET_ZERO = 0;
   private final static int BULLET_PLAYER1 = 1167;
   private final static int BULLET_PLAYER2 = 1168;
+  private final static int BULLET_PLAYER1_NORMAL = 1200;
+  private final static int BULLET_PLAYER2_NORMAL = 1201;
+  private final static int BULLET_PLAYER1_DUAL = 1210;
+  private final static int BULLET_PLAYER2_DUAL = 1211;
+  private final static int BULLET_PLAYER1_SNIPER = 1220;
+  private final static int BULLET_PLAYER2_SNIPER = 1221;
+  private final static int BULLET_PLAYER1_SOAD = 1230;
+  private final static int BULLET_PLAYER2_SOAD = 1231;
 
   // エフェクトのタイプ
   private final static int EFFECT_NORMAL = 21;
@@ -118,7 +126,7 @@ class STG extends gameMaster {
   private class Bullet {
     // 変数とか
     private float x, y, r, ang, speed;
-    private int type;
+    private int type, time;
 
     // コンストラクタ
     Bullet(int x, int y, int r, int ang, int speed, int type) {
@@ -128,6 +136,7 @@ class STG extends gameMaster {
       this.ang = ang;
       this.speed = speed;
       this.type = type;
+      time = 0;
     }
 
     // 当たり判定用関数
@@ -141,11 +150,27 @@ class STG extends gameMaster {
 
     // 処理
     boolean move() {
+      time++;
       x = sin(radians(ang))*speed + x;
       y = cos(radians(ang))*speed + y;
 
       // 画面外に行ったら削除する
       if (constrain(x, -64, 664) != x || constrain(y, -64, 544) != y) return true;
+
+      // 弾ごとの追加処理
+      switch(type) {
+      case BULLET_PLAYER1_SOAD:
+      case BULLET_PLAYER2_SOAD:
+        if (time > 30) return true;
+        break;
+      case BULLET_PLAYER1_NORMAL:
+      case BULLET_PLAYER2_NORMAL:
+      case BULLET_PLAYER1_DUAL:
+      case BULLET_PLAYER2_DUAL:
+        speed-=0.38;
+        if (speed <= 1) return true;
+        break;
+      }
 
       return false;
     }
@@ -164,14 +189,38 @@ class STG extends gameMaster {
         ellipse(x, y, r, r);
         break;
       case BULLET_PLAYER1:
+      case BULLET_PLAYER1_SNIPER:
         fill(0, 0, 255, 255);
         stroke(255);
         ellipse(x, y, r/2, r*4);
         break;
       case BULLET_PLAYER2:
+      case BULLET_PLAYER2_SNIPER:
         fill(255, 0, 0, 255);
         stroke(255);
         ellipse(x, y, r/2, r*4);
+        break;
+      case BULLET_PLAYER1_NORMAL:
+      case BULLET_PLAYER1_DUAL:
+        fill(0, 0, 255, speed >= 8 ? 255 : 255*speed/8);
+        stroke(speed >= 8 ? 255 : 255*speed/8);
+        ellipse(x, y, r/2, r*4);
+        break;
+      case BULLET_PLAYER2_NORMAL:
+      case BULLET_PLAYER2_DUAL:
+        fill(255, 0, 0, speed >= 8 ? 255 : 255*speed/8);
+        stroke(speed >= 8 ? 255 : 255*speed/8);
+        ellipse(x, y, r/2, r*4);
+        break;
+      case BULLET_PLAYER1_SOAD:
+        fill(0, 0, 255, 255*(30-time)/30);
+        stroke(255, 255*(30-time)/30);
+        rotateRect(int(x), int(y), int(r/2), int(r*4), int(180-ang));
+        break;
+      case BULLET_PLAYER2_SOAD:
+        fill(255, 0, 0, 255*(30-time)/30);
+        stroke(255, 255*(30-time)/30);
+        rotateRect(int(x), int(y), int(r/2), int(r*4), int(180-ang));
         break;
       }
     }
@@ -180,15 +229,23 @@ class STG extends gameMaster {
   // プレイヤーのクラス
   private class Player {
     // 変数とか
-    private int x, y, score, id, hp, time, maxHP;
+    private int x, y, score, id, hp, time, maxHP, typeATK;
     private double xAdd, yAdd;
     private ArrayList<Bullet> playerBullet = new ArrayList<Bullet>();
     private PImage[] img = new PImage[1];
+
+    // 指定
+    private final static int ATK_NORMAL = 1;
+    private final static int ATK_DUAL = 2;
+    private final static int ATK_SNIPER = 3;
+    private final static int ATK_SOAD = 4;
+    private final int AKT_List[] = {ATK_NORMAL, ATK_DUAL, ATK_SNIPER, ATK_SOAD};
 
     // コンストラクタ
     Player(int id, int maxHP) {
       this.id = id;	
       this.maxHP = maxHP;
+      typeATK = AKT_List[1];
       x = 320;
       y = 400;
       score = 0;
@@ -224,7 +281,23 @@ class STG extends gameMaster {
 
       // 攻撃　
       if (controller.getButtonL(id) == 1) {
-        if (time%2 == 0) for (int i=0; i<2; i++) playerBullet.add(new Bullet(x-8+16*i, y, 6, 180, 16, id == 0 ? BULLET_PLAYER1 : BULLET_PLAYER2));
+        switch(typeATK) {
+        case ATK_NORMAL:
+          playerBullet.add(new Bullet(x+8, y, 6, 180, 16, id == 0 ? BULLET_PLAYER1_NORMAL : BULLET_PLAYER2_NORMAL));
+          break;
+        case ATK_DUAL:
+          if (time%2 == 0)
+            for (int i=0; i<2; i++)
+              playerBullet.add(new Bullet(x-8+16*i, y, 6, 180, 16, id == 0 ? BULLET_PLAYER1_DUAL : BULLET_PLAYER2_DUAL));
+          break;
+        case ATK_SNIPER:
+          if (time%2 == 0)
+            playerBullet.add(new Bullet(x-8, y, 6, 180, 20, id == 0 ? BULLET_PLAYER1_SNIPER : BULLET_PLAYER2_SNIPER));
+          break;
+        case ATK_SOAD:
+          playerBullet.add(new Bullet(x, y, 12, time*8, 6, id == 0 ? BULLET_PLAYER1_SOAD : BULLET_PLAYER2_SOAD));
+          break;
+        }
       }
 
       // プレイヤーの弾が敵に接触しているかを判定する
@@ -583,11 +656,14 @@ class STG extends gameMaster {
     void display() {
       stroke(#0000FF);
       if (id == 1) stroke(#FF0000);
-      strokeWeight(3);
+      strokeWeight(4);
       noFill();
       ellipse(x, y, 32, 32);
-      line(x-20, y, x+20, y);
-      line(x, y-20, x, y+20);
+      noStroke();
+      fill(#0000FF);
+      if (id == 1) fill(#FF0000);
+      rotateRect(x, y, 46, 4, time);
+      rotateRect(x, y, 46, 4, time+90);
       strokeWeight(1);
     }
 

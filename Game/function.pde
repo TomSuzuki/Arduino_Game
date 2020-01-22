@@ -10,7 +10,7 @@ void msg(String s, int x, int y, int px, int py, color c) {
 };
 
 // 縁取りmsg
-void msg(String s, int x, int y, int px, int py, color c, color c2,int w) {
+void msg(String s, int x, int y, int px, int py, color c, color c2, int w) {
   textAlign(px, py);
   fill(c2);
   for (int i = 0; i < 9; i++) text(s, x+(-1+i/3)*w, y+(-1+i%3)*w);
