@@ -75,8 +75,8 @@ class STG extends gameMaster {
       Img_GameFrame = loadImage("./gameFrame.png");
 
       // オブジェクトの初期化
-      int maxHP = 100;
-      if (type == GAME_TYPE_COOPERATION) maxHP = 300;
+      int maxHP = 60;
+      if (type == GAME_TYPE_COOPERATION) maxHP = 120;
       player.add(new Player(0, maxHP));
       player.add(new Player(1, maxHP));
       effect.add(new Effect(0, 0, EFFECT_BACKGROUND_A));
@@ -108,7 +108,7 @@ class STG extends gameMaster {
         if (player.get(0).score == player.get(1).score) s = "引き分け";
         else if (player.get(0).score < player.get(1).score) s = "2P（青）の勝ち！";
         else s = "1P（赤）の勝ち！";
-      }
+      }else if(player.get(0).hp <= 0 || player.get(1).hp <= 0) s = "GAME OVER !!";
 
       // テキスト
       textFont(font);
@@ -132,6 +132,13 @@ class STG extends gameMaster {
       // 時間の進行
       remainingTime--;
       if (remainingTime == 0) gameFlg = FLG_RESULT;
+
+	  // 終了判定
+	  if(player.get(0).hp <= 0 || player.get(1).hp <= 0) {
+		  if(player.get(0).hp <= 0) player.get(0).score = 0;
+		  if(player.get(1).hp <= 0) player.get(1).score = 0;
+		  gameFlg = FLG_RESULT;
+	  }
     }
 
     // UI
@@ -689,7 +696,7 @@ class STG extends gameMaster {
     case FLG_EXIT:
       exit();
     default:
-      println("【ゲーム】致命的なエラーもしくは実装されていない機能です。 Error-000"+gameFlg);
+      println("【EXIT】gameFlg = "+gameFlg);
       exit();
     }
 
@@ -796,10 +803,10 @@ class STG extends gameMaster {
         centerRect(480, 240, 180, 40);
         if (flg) gameFlg = FLG_SETUP_BATTLE;
       }
-      if (c.hitChk(320, 340, 220, 40)) {
+      /*if (c.hitChk(320, 340, 220, 40)) {
         centerRect(320, 340, 220, 40);
         if (flg) gameFlg = FLG_SETUP_RANKING;
-      }
+      }*/
       if (c.hitChk(320, 400, 120, 40)) {
         centerRect(320, 400, 120, 40);
         if (flg) gameFlg = FLG_EXIT;
@@ -814,7 +821,7 @@ class STG extends gameMaster {
     textSize(32);
     msg("協力モード", 160, 240, CENTER, CENTER, #DDDDDD);
     msg("対戦モード", 480, 240, CENTER, CENTER, #DDDDDD);
-    msg("スコアを見る", 320, 340, CENTER, CENTER, #DDDDDD);
+    //msg("スコアを見る", 320, 340, CENTER, CENTER, #DDDDDD);
     msg("終了", 320, 400, CENTER, CENTER, #DDDDDD);
 
     // フォーカスの描画
@@ -823,9 +830,6 @@ class STG extends gameMaster {
 
   // ゲーム中の処理
   void gameRun() {
-
-    // ゲーム進行クラス
-    gameFunctions.x25();
 
     // プレイヤーの処理
     for (Player p : player) p.move();
@@ -851,5 +855,8 @@ class STG extends gameMaster {
     // UI関連
     gameFunctions.displayFrame();
     gameFunctions.displayUserInterface();
+
+    // ゲーム進行クラス
+    gameFunctions.x25();
   }
 }
