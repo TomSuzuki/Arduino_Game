@@ -13,6 +13,7 @@ class STG extends gameMaster {
   private ArrayList<Enemy> enemy = new ArrayList<Enemy>();
   private ArrayList<Effect> effect = new ArrayList<Effect>();
   private GameFunctions gameFunctions;
+  private float fps;
 
   // 画像、音声用
   private PImage Img_StartBack;
@@ -87,8 +88,9 @@ class STG extends gameMaster {
     // UI
     void displayUserInterface() {
       // FPS
+	  if(frameCount%60 == 0) fps = frameRate;
       textSize(12);
-      msg("FPS "+String.format("%2.3f", frameRate), 8, 474, LEFT, BOTTOM, #FFFFFF);
+      msg("FPS "+String.format("%2.1f", fps), 8, 474, LEFT, BOTTOM, #FFFFFF);
 
       // プレイヤーUI
       for (Player p : player) p.displayUserInterface();
