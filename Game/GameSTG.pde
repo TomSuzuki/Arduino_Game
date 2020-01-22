@@ -17,6 +17,8 @@ class STG extends gameMaster {
 
   // 画像、音声用
   private PImage Img_StartBack;
+  private PImage Img_Player0 = loadImage("./player0.png");
+  private PImage Img_Player1 = loadImage("./player1.png");
 
   // ゲームの状態
   private final static int FLG_START = 3;
