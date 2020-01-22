@@ -229,7 +229,7 @@ class STG extends gameMaster {
   // プレイヤーのクラス
   private class Player {
     // 変数とか
-    private int x, y, score, id, hp, time, maxHP, typeATK;
+    private int x, y, score, id, hp, time, maxHP, typeATK, pButtonR;
     private double xAdd, yAdd;
     private ArrayList<Bullet> playerBullet = new ArrayList<Bullet>();
     private PImage[] img = new PImage[12];
@@ -249,7 +249,7 @@ class STG extends gameMaster {
     Player(int id, int maxHP) {
       this.id = id;	
       this.maxHP = maxHP;
-      
+
       // 初期値の設定
       typeATK = AKT_List[0];
       x = 320;
@@ -257,7 +257,7 @@ class STG extends gameMaster {
       score = 0;
       hp = maxHP;
       time = 0;
-      
+
       // 画像のロード
       img[0] = loadImage(String.format("./player%d/n0.png", id));
       img[1] = loadImage(String.format("./player%d/n1.png", id));
@@ -283,6 +283,18 @@ class STG extends gameMaster {
 
       // プレイヤーの弾の処理
       for (int i = 0; i < playerBullet.size(); i++) if (playerBullet.get(i).move()) playerBullet.remove(i);
+
+      // 攻撃切り替え処理
+      if (pButtonR == 0 && controller.getButtonR(id)== 1) {
+        pButtonR = 1;
+
+		// 切り替え本体
+        typeATK+=1;
+        if (typeATK > AKT_List.length) typeATK = AKT_List[0];
+
+		// 切り替えエフェクトの出現
+      }
+      if (controller.getButtonR(id)== 0)  pButtonR = 0;
 
       // 移動
       time++;
