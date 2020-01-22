@@ -1,4 +1,4 @@
-// ゲーム用スーパークラス
+// ゲーム用のクラスの型
 class gameMaster {
 
   // 変数とか
@@ -20,4 +20,5 @@ class gameMaster {
   // タイトル画面表示時に呼ばれる
   void gameTitle() {
   }
+  
 }
