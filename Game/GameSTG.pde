@@ -86,6 +86,44 @@ class STG extends gameMaster {
       remainingTime = 60*30;
     }
 
+    // スコア画面の描画＆処理
+    void gameResult() {
+      // 背景
+      background(0);
+
+      // カーソル
+      for (Cursor c : cursor) {
+        boolean flg = c.move();
+        fill(255, 255, 255, frameCount%6 < 2 ? 128 : 96);
+        noStroke();
+        if (c.hitChk(320, 400, 240, 40)) {
+          centerRect(320, 400, 240, 40);
+		  if(flg) gameFlg = FLG_START;
+        }
+      }
+
+      // 表示するもの
+      String s = String.format("%,d", player.get(0).score+player.get(1).score);
+      if (type == GAME_TYPE_BATTLE) {
+        if (player.get(0).score == player.get(1).score) s = "引き分け";
+        else if (player.get(0).score < player.get(1).score) s = "2P（青）の勝ち！";
+        else s = "1P（赤）の勝ち！";
+      }
+
+      // テキスト
+      textFont(font);
+      textSize(48);
+      msg("- RESULT -", 320, 80, CENTER, CENTER, #FFFFFF);
+      msg(s, 320, 300, CENTER, CENTER, #DDDDDD);
+      textSize(32);
+      msg(String.format("%,d", player.get(0).score), 160, 200, CENTER, CENTER, #DDDDDD);
+      msg(String.format("%,d", player.get(1).score), 480, 200, CENTER, CENTER, #DDDDDD);
+      msg("タイトルへ戻る", 320, 400, CENTER, CENTER, #DDDDDD);
+
+      // フォーカスの描画
+      for (Cursor c : cursor) c.display();
+    }
+
     // ゲームの進行
     void x25() {
       // 敵の出現
@@ -573,7 +611,7 @@ class STG extends gameMaster {
       case EFFECT_PLAYERIMG_1:
       case EFFECT_PLAYERIMG_2:
         time++;
-		y++;
+        y++;
         if (time > 80) return true;
         break;
       default:
@@ -638,7 +676,7 @@ class STG extends gameMaster {
       gameRun();
       break;
     case FLG_RESULT:
-      gameResult();
+      gameFunctions.gameResult();
       break;
     case FLG_SETUP_BATTLE:
       gameFunctions = new GameFunctions(GAME_TYPE_BATTLE);
@@ -679,21 +717,9 @@ class STG extends gameMaster {
     }
   }
 
-  // 結果画面の描画
-  void gameResult() {
-    // 表示
-    background(0);    
-    textFont(font);
-    textSize(32);
-    int y = 0;
-    int add = 38;
-    msg("GAME OVER !!", 12, y+=add, LEFT, TOP, #FFFFFF);
-    //msg("SCORE: "+score, 12, y+=add, LEFT, TOP, #FFFFFF);
-  }
-
   // スタートページ用カーソルクラス
   private class Cursor {
-    private int id, time, x, y;
+    private int id, time, x, y, pButton = 1;
     private double xAdd, yAdd;
 
     Cursor(int id) {
@@ -711,7 +737,11 @@ class STG extends gameMaster {
       if (abs((int)yAdd) < 1) yAdd = 0;
       x = constrain(x+(int)(xAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 640);
       y = constrain(y+(int)(yAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 480);
-      if (controller.getButtonL(id) == 1 || controller.getButtonR(id) == 1) return true;
+      if (controller.getButtonL(id) == 1 && pButton == 0) {
+		  pButton = 1;
+		  return true;
+	  }
+	  pButton = controller.getButtonL(id);
       return false;
     }
 
