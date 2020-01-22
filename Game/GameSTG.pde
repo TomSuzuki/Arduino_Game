@@ -232,7 +232,7 @@ class STG extends gameMaster {
     private int x, y, score, id, hp, time, maxHP, typeATK;
     private double xAdd, yAdd;
     private ArrayList<Bullet> playerBullet = new ArrayList<Bullet>();
-    private PImage[] img = new PImage[1];
+    private PImage[] img = new PImage[12];
 
     // 指定
     private final static int ATK_NORMAL = 1;
@@ -240,24 +240,38 @@ class STG extends gameMaster {
     private final static int ATK_SNIPER = 3;
     private final static int ATK_SOAD = 4;
     private final int AKT_List[] = {ATK_NORMAL, ATK_DUAL, ATK_SNIPER, ATK_SOAD};
+    private final int IMG_NORMAL[] = {0, 1, 2, 1};
+    private final int IMG_DUAL[] = {3, 4, 5, 4};
+    private final int IMG_SNIPER[] = {6, 7, 8, 7};
+    private final int IMG_SOAD[] = {9, 10, 11, 10};
 
     // コンストラクタ
     Player(int id, int maxHP) {
       this.id = id;	
       this.maxHP = maxHP;
-      typeATK = AKT_List[1];
+      
+      // 初期値の設定
+      typeATK = AKT_List[0];
       x = 320;
       y = 400;
       score = 0;
       hp = maxHP;
       time = 0;
+      
       // 画像のロード
-      /*for (int i = 0; i < 4; i++) {
-       img[i] = loadImage("player0"+(i+1)+".png");
-       img[i].resize(48, 48);
-       }*/
-      img[0] = loadImage("デュアル"+(id)+".png");
-      img[0].resize(48, 48);
+      img[0] = loadImage(String.format("./player%d/n0.png", id));
+      img[1] = loadImage(String.format("./player%d/n1.png", id));
+      img[2] = loadImage(String.format("./player%d/n2.png", id));
+      img[3] = loadImage(String.format("./player%d/d0.png", id));
+      img[4] = loadImage(String.format("./player%d/d1.png", id));
+      img[5] = loadImage(String.format("./player%d/d2.png", id));
+      img[6] = loadImage(String.format("./player%d/s0.png", id));
+      img[7] = loadImage(String.format("./player%d/s1.png", id));
+      img[8] = loadImage(String.format("./player%d/s2.png", id));
+      img[9] = loadImage(String.format("./player%d/t0.png", id));
+      img[10] = loadImage(String.format("./player%d/t1.png", id));
+      img[11] = loadImage(String.format("./player%d/t2.png", id));
+      for (int i = 0; i < img.length; i++) img[i].resize(48, 48);
     };
 
     // 移動関数
@@ -315,10 +329,20 @@ class STG extends gameMaster {
       for (Bullet b : playerBullet) b.display();
 
       // プレイヤーの描画
-      //image(img[(time/8)%4], x-24, y-24);
-      image(img[0], x-24, y-24);
-      fill(255);
-      //ellipse(x, y, 32, 32);
+      switch(typeATK) {
+      case ATK_NORMAL:
+        image(img[IMG_NORMAL[(time/8)%IMG_NORMAL.length]], x-24, y-24);
+        break;
+      case ATK_SOAD:
+        image(img[IMG_SOAD[(time/8)%IMG_SOAD.length]], x-24, y-24);
+        break;
+      case ATK_SNIPER:
+        image(img[IMG_SNIPER[(time/8)%IMG_SNIPER.length]], x-24, y-24);
+        break;
+      case ATK_DUAL:
+        image(img[IMG_DUAL[(time/8)%IMG_DUAL.length]], x-24, y-24);
+        break;
+      }
     };
 
     // HP減少
