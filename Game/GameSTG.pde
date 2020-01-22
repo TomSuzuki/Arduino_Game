@@ -96,9 +96,9 @@ class STG extends gameMaster {
         boolean flg = c.move();
         fill(255, 255, 255, frameCount%6 < 2 ? 128 : 96);
         noStroke();
-        if (c.hitChk(320, 400, 240, 40)) {
-          centerRect(320, 400, 240, 40);
-		  if(flg) gameFlg = FLG_START;
+        if (c.hitChk(320, 400, 120, 40)) {
+          centerRect(320, 400, 120, 40);
+		  if(flg) gameFlg = FLG_EXIT;
         }
       }
 
@@ -118,7 +118,7 @@ class STG extends gameMaster {
       textSize(32);
       msg(String.format("%,d", player.get(0).score), 160, 200, CENTER, CENTER, #DDDDDD);
       msg(String.format("%,d", player.get(1).score), 480, 200, CENTER, CENTER, #DDDDDD);
-      msg("タイトルへ戻る", 320, 400, CENTER, CENTER, #DDDDDD);
+      msg("終了", 320, 400, CENTER, CENTER, #DDDDDD);
 
       // フォーカスの描画
       for (Cursor c : cursor) c.display();
@@ -699,7 +699,6 @@ class STG extends gameMaster {
       println("【EXIT】gameFlg = "+gameFlg);
       exit();
     }
-
     time++;
 
     // デバッグ用の情報

@@ -1,5 +1,5 @@
 // デバッグ用フラグ
-final boolean modeDebug = true;
+final boolean modeDebug = false;
 
 // デフォルトフォント（これ以外を使いたい場合はメモリの状況を確認する）
 PFont font;
@@ -10,7 +10,7 @@ STG g1;
 void setup() {
   // ウィンドウ関連
   size(640, 480);
-  surface.setTitle("Gyro STG - version 0.7 beta");
+  surface.setTitle("Gyro STG - version 1.00");
   font = loadFont("./data/rounded-l-mplus-1c-black-48.vlw");
 
   // ゲームの生成
