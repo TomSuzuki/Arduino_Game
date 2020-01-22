@@ -1,5 +1,5 @@
 /*
- * コントローラー用クラス ver 1.12c
+ * コントローラー用クラス ver 1.12d
  * - クラス名のcontrollerは固定（serial関連がうまく行き次第直す）
  *
  * // setup内で必ず実行
@@ -124,11 +124,17 @@ class Controller {
 
   // 取得用
   int getAngleX(int player) {
-    return -arduinoState.get(player).AngleX;
+    int n = -arduinoState.get(player).AngleX;
+    if (n > 180) n = n - 360;
+    if (n < -180) n = n + 360;
+    return n;
   }
 
   int getAngleY(int player) {
-    return arduinoState.get(player).AngleY;
+    int n = arduinoState.get(player).AngleY;
+    if (n > 180) n = n - 360;
+    if (n < -180) n = n + 360;
+    return n;
   }
 
   int getButtonL(int player) {
