@@ -167,7 +167,7 @@ class STG extends gameMaster {
       case BULLET_PLAYER2_NORMAL:
       case BULLET_PLAYER1_DUAL:
       case BULLET_PLAYER2_DUAL:
-        speed-=0.38;
+        speed-=0.52;
         if (speed <= 1) return true;
         break;
       }
@@ -601,6 +601,8 @@ class STG extends gameMaster {
     if (modeDebug) {
       int y = 5-12;
       textSize(12);
+      msg("modeDebug = TRUE", 5, y+=15, LEFT, TOP, #FFFFFF);
+      msg("", 5, y+=15, LEFT, TOP, #FFFFFF);
       msg("[STG]", 5, y+=15, LEFT, TOP, #FFFFFF);
       msg("gameFlg = "+gameFlg, 5, y+=15, LEFT, TOP, #FFFFFF);
       msg("time= "+time, 5, y+=15, LEFT, TOP, #FFFFFF);
