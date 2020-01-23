@@ -617,11 +617,11 @@ class STG extends gameMaster {
         speed = random(1, 2);
         break;
       case EFFECT_PLAYERIMG_1:
-        this.x = 20;
+        this.x = 10;
         this.y = 80;
         break;
       case EFFECT_PLAYERIMG_2:
-        this.x = 620-212;
+        this.x = 620-252;
         this.y = 80;
         break;
       }
@@ -672,6 +672,11 @@ class STG extends gameMaster {
       case EFFECT_PLAYERIMG_1:
         tint(255.0, 255*(60-time)/40);
         image(Img_Player0, x, y);
+        noTint();
+        break;
+      case EFFECT_PLAYERIMG_2:
+        tint(255.0, 255*(60-time)/40);
+        image(Img_Player1, x, y);
         noTint();
         break;
       }
