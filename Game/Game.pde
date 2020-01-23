@@ -10,16 +10,15 @@ STG g1;
 void setup() {
   // ウィンドウ関連
   size(640, 480);
-  surface.setTitle("Gyro STG - version 1.00");
+  surface.setTitle("Gyro STG - version 1.02");
   font = loadFont("./data/rounded-l-mplus-1c-black-48.vlw");
-
-  // ゲームの生成
-  g1 = new STG();
 
   // Arduinoの初期化
   //controller.arduinoSetup(new String[] {"COM6"});  // windows用（COMの番号を書き換える！）
   controller.arduinoSetup(controller.getArduinoList());  // mac用（自動で判別）
-  delay(100);
+  
+  // ゲームの生成
+  g1 = new STG();
 
   // ゲームの初期化
   g1.gameSetup();

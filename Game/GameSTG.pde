@@ -98,17 +98,31 @@ class STG extends gameMaster {
         noStroke();
         if (c.hitChk(320, 400, 120, 40)) {
           centerRect(320, 400, 120, 40);
-		  if(flg) gameFlg = FLG_EXIT;
+          if (flg) gameFlg = FLG_EXIT;
         }
       }
 
       // 表示するもの
       String s = String.format("%,d", player.get(0).score+player.get(1).score);
       if (type == GAME_TYPE_BATTLE) {
-        if (player.get(0).score == player.get(1).score) s = "引き分け";
-        else if (player.get(0).score < player.get(1).score) s = "2P（青）の勝ち！";
-        else s = "1P（赤）の勝ち！";
-      }else if(player.get(0).hp <= 0 || player.get(1).hp <= 0) s = "GAME OVER !!";
+        if (player.get(0).score == player.get(1).score) {
+          s = "引き分け";
+          controller.setLCD(0, "draw");
+          controller.setLCD(1, "draw");
+        } else if (player.get(0).score < player.get(1).score) {
+          s = "2P（青）の勝ち！";
+          controller.setLCD(0, "you loss!!");
+          controller.setLCD(1, "you win!!");
+        } else {
+          s = "1P（赤）の勝ち！";
+          controller.setLCD(0, "you win!!");
+          controller.setLCD(1, "you loss!!");
+        }
+      } else if (player.get(0).hp <= 0 || player.get(1).hp <= 0) {
+        s = "GAME OVER !!";
+        controller.setLCD(0, "game over!!");
+        controller.setLCD(1, "game over!!");
+      }
 
       // テキスト
       textFont(font);
@@ -133,12 +147,12 @@ class STG extends gameMaster {
       remainingTime--;
       if (remainingTime == 0) gameFlg = FLG_RESULT;
 
-	  // 終了判定
-	  if(player.get(0).hp <= 0 || player.get(1).hp <= 0) {
-		  if(player.get(0).hp <= 0) player.get(0).score = 0;
-		  if(player.get(1).hp <= 0) player.get(1).score = 0;
-		  gameFlg = FLG_RESULT;
-	  }
+      // 終了判定
+      if (player.get(0).hp <= 0 || player.get(1).hp <= 0) {
+        if (player.get(0).hp <= 0) player.get(0).score = 0;
+        if (player.get(1).hp <= 0) player.get(1).score = 0;
+        gameFlg = FLG_RESULT;
+      }
     }
 
     // UI
@@ -282,6 +296,7 @@ class STG extends gameMaster {
     private double xAdd, yAdd;
     private ArrayList<Bullet> playerBullet = new ArrayList<Bullet>();
     private PImage[] img = new PImage[12];
+    private PImage icon;
 
     // 指定
     private final static int ATK_NORMAL = 1;
@@ -299,6 +314,8 @@ class STG extends gameMaster {
       this.id = id;	
       this.maxHP = maxHP;
 
+      controller.setLCD(id, "game start!!");
+
       // 初期値の設定
       typeATK = AKT_List[0];
       x = 320;
@@ -308,6 +325,8 @@ class STG extends gameMaster {
       time = 0;
 
       // 画像のロード
+      icon = loadImage("./icon"+id+".png");
+      icon.resize(40, 40);
       img[0] = loadImage(String.format("./player%d/n0.png", id));
       img[1] = loadImage(String.format("./player%d/n1.png", id));
       img[2] = loadImage(String.format("./player%d/n2.png", id));
@@ -432,6 +451,7 @@ class STG extends gameMaster {
       strokeWeight(3);
       fill(#222222);
       rect(x+5, 5, 40, 40);  // キャラクターアイコンに置き換える？
+      image(icon, 5+x, 5);
       strokeWeight(1);
       text("PLAYER "+(id+1), x+55, 10);
       textAlign(RIGHT, TOP);
@@ -694,6 +714,8 @@ class STG extends gameMaster {
       gameFlg = FLG_GAME;
       break;
     case FLG_EXIT:
+      controller.setZero(0);
+      controller.setZero(1);
       exit();
     default:
       println("【EXIT】gameFlg = "+gameFlg);
@@ -744,10 +766,10 @@ class STG extends gameMaster {
       x = constrain(x+(int)(xAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 640);
       y = constrain(y+(int)(yAdd * (controller.getButtonR(id) == 1 ? 0.4 : 1)), 0, 480);
       if (controller.getButtonL(id) == 1 && pButton == 0) {
-		  pButton = 1;
-		  return true;
-	  }
-	  pButton = controller.getButtonL(id);
+        pButton = 1;
+        return true;
+      }
+      pButton = controller.getButtonL(id);
       return false;
     }
 
@@ -785,6 +807,12 @@ class STG extends gameMaster {
   // スタート前の説明ページの表示
   private Cursor[] cursor = new Cursor[2];
   void gameStart() {
+    // ディスプレイ
+    if (frameCount%60 == 0) {
+      controller.setLCD(0, "please select");
+      controller.setLCD(1, "please select");
+    }
+
     // 表示
     background(0);
     image(Img_StartBack, 0, 0);
@@ -803,9 +831,9 @@ class STG extends gameMaster {
         if (flg) gameFlg = FLG_SETUP_BATTLE;
       }
       /*if (c.hitChk(320, 340, 220, 40)) {
-        centerRect(320, 340, 220, 40);
-        if (flg) gameFlg = FLG_SETUP_RANKING;
-      }*/
+       centerRect(320, 340, 220, 40);
+       if (flg) gameFlg = FLG_SETUP_RANKING;
+       }*/
       if (c.hitChk(320, 400, 120, 40)) {
         centerRect(320, 400, 120, 40);
         if (flg) gameFlg = FLG_EXIT;
