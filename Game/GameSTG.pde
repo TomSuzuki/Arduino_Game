@@ -110,11 +110,11 @@ class STG extends gameMaster {
           controller.setLCD(0, "draw");
           controller.setLCD(1, "draw");
         } else if (player.get(0).score < player.get(1).score) {
-          s = "2P（青）の勝ち！";
+          s = "2P（赤）の勝ち！";
           controller.setLCD(0, "you loss!!");
           controller.setLCD(1, "you win!!");
         } else {
-          s = "1P（赤）の勝ち！";
+          s = "1P（青）の勝ち！";
           controller.setLCD(0, "you win!!");
           controller.setLCD(1, "you loss!!");
         }
@@ -174,8 +174,13 @@ class STG extends gameMaster {
       }
       textSize(14);
       msg(s, 320, 55, CENTER, TOP, #FFFFFF, c, 1);
-      textSize(26);
-      msg(""+(1+remainingTime/60), 630, 474, RIGHT, BOTTOM, #FFFFFF, #222222, 1);
+      if (1+remainingTime/60 <= 5) {
+        textSize(72);
+        msg(""+(1+remainingTime/60), 320, 240, CENTER, CENTER, #FFFFFF, #222222, 1);
+      } else {
+        textSize(26);
+        msg(""+(1+remainingTime/60), 630, 474, RIGHT, BOTTOM, #FFFFFF, #222222, 1);
+      }
     }
 
     // ゲームのフレーム
