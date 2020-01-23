@@ -763,6 +763,7 @@ class STG extends gameMaster {
     }
 
     boolean move() {
+      if (time == 60) controller.setLED(id, id);
       time++;
       xAdd = constraind((xAdd + controller.getAngleX(id)/3)/2, -18, 18);
       yAdd = constraind((yAdd + controller.getAngleY(id)/3)/2, -18, 18);
