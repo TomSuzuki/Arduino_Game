@@ -296,6 +296,7 @@ class STG extends gameMaster {
     private double xAdd, yAdd;
     private ArrayList<Bullet> playerBullet = new ArrayList<Bullet>();
     private PImage[] img = new PImage[12];
+    private PImage icon;
 
     // 指定
     private final static int ATK_NORMAL = 1;
@@ -324,6 +325,8 @@ class STG extends gameMaster {
       time = 0;
 
       // 画像のロード
+      icon = loadImage("./icon"+id+".png");
+      icon.resize(40, 40);
       img[0] = loadImage(String.format("./player%d/n0.png", id));
       img[1] = loadImage(String.format("./player%d/n1.png", id));
       img[2] = loadImage(String.format("./player%d/n2.png", id));
@@ -448,6 +451,7 @@ class STG extends gameMaster {
       strokeWeight(3);
       fill(#222222);
       rect(x+5, 5, 40, 40);  // キャラクターアイコンに置き換える？
+      image(icon, 5+x, 5);
       strokeWeight(1);
       text("PLAYER "+(id+1), x+55, 10);
       textAlign(RIGHT, TOP);
@@ -710,6 +714,8 @@ class STG extends gameMaster {
       gameFlg = FLG_GAME;
       break;
     case FLG_EXIT:
+      controller.setZero(0);
+      controller.setZero(1);
       exit();
     default:
       println("【EXIT】gameFlg = "+gameFlg);
