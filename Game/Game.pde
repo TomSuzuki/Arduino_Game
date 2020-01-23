@@ -16,7 +16,7 @@ void setup() {
   // Arduinoの初期化
   //controller.arduinoSetup(new String[] {"COM6"});  // windows用（COMの番号を書き換える！）
   controller.arduinoSetup(controller.getArduinoList());  // mac用（自動で判別）
-  
+
   // ゲームの生成
   g1 = new STG();
 
